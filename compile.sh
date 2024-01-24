@@ -33,7 +33,7 @@ cd "$SCRIPT_DIR/"
 
 if [[ ! -f vendor/box.phar ]]; then
     mkdir -p vendor
-    wget -Ovendor/box.phar https://github.com/box-project/box2/releases/download/2.7.5/box-2.7.5.phar
+    wget -Ovendor/box.phar https://github.com/box-project/box/releases/download/4.6.1/box.phar
 fi
 
 BOX_PATH=vendor/box.phar
