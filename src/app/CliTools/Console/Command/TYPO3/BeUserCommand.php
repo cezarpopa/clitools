@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\TYPO3;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\Mysql\AbstractCommand;
 use CliTools\Database\DatabaseConnection;
 use CliTools\Utility\Typo3Utility;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,9 +29,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
+class BeUserCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:beuser';
     /**
      * Configure command
      */
@@ -38,7 +40,7 @@ class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
     {
         parent::configure();
 
-        $this->setName('typo3:beuser')
+        $this
              ->setDescription('Add backend admin user to database')
              ->addArgument(
                  'database',
@@ -88,19 +90,19 @@ class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
         }
 
         // check username
-        if (!preg_match('/^[-_a-zA-Z0-9\.]+$/', $username)) {
+        if (!preg_match('/^[-_a-zA-Z0-9\.]+$/', (string) $username)) {
             $output->writeln('<p-error>Invalid username</p-error>');
 
             return 1;
         }
 
-        $output->writeln('<p>Using user: "' . htmlspecialchars($username) . '"</p>');
+        $output->writeln('<p>Using user: "' . htmlspecialchars((string) $username) . '"</p>');
 
         // Set default password if not specified
         if (empty($password)) {
             $password = 'dev';
         }
-        $output->writeln('<p>Using pass: "' . htmlspecialchars($password) . '"</p>');
+        $output->writeln('<p>Using pass: "' . htmlspecialchars((string) $password) . '"</p>');
 
         // ##################
         // Salting
@@ -170,7 +172,7 @@ class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
         // ##################
 
         // Default UserTS
-        $tsConfig = array(
+        $tsConfig = [
             // Backend stuff
             'options.clearCache.system = 1',
             'options.clearCache.all = 1',
@@ -200,50 +202,29 @@ class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             'setup.default.moduleData.file_list.clipBoard = 1',
             'setup.default.moduleData.file_list.localization = 1',
             'setup.default.moduleData.file_list.showPalettes = 1',
-
-        );
+        ];
         $tsConfig = implode("\n", $tsConfig);
 
         // Default uc
-        $uc = array(
-            'thumbnailsByDefault' => 1,
-            'recursiveDelete' => 1,
-            'showHiddenFilesAndFolders' => 1,
-            'edit_RTE' => 1,
-            'resizeTextareas' => 1,
-            'resizeTextareas_Flexible' => 1,
-            'copyLevels' => 99,
-            'rteResize' => 99,
-            'moduleData' => array(
-                'web_layout' => array(
-                    // not "quick edit" but "columns" should be the
-                    // default submodule within the page module
-                    'function' => '1',
-                ),
-                'web_list' => array(
-                    // check the important boxes right away
-                    'bigControlPanel' => '1',
-                    'clipBoard' => '1',
-                    'localization' => '1',
-                    'showPalettes' => '1',
-                ),
-                'web_ts' => array(
-                    // not "constant editor" but "object browser"
-                    'function' => 'TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateObjectBrowserModuleFunctionController',
-                    // better defaults for immediate debugging the actual typoscript
-                    'ts_browser_type' => 'setup',
-                    'ts_browser_const' => 'subst',
-                    'ts_browser_fixedLgd' => '0',
-                    'ts_browser_showComments' => '1',
-                ),
-                'file_list' => array(
-                    'bigControlPanel' => '1',
-                    'clipBoard' => '1',
-                    'localization' => '1',
-                    'showPalettes' => '1',
-                ),
-            ),
-        );
+        $uc = ['thumbnailsByDefault' => 1, 'recursiveDelete' => 1, 'showHiddenFilesAndFolders' => 1, 'edit_RTE' => 1, 'resizeTextareas' => 1, 'resizeTextareas_Flexible' => 1, 'copyLevels' => 99, 'rteResize' => 99, 'moduleData' => ['web_layout' => [
+            // not "quick edit" but "columns" should be the
+            // default submodule within the page module
+            'function' => '1',
+        ], 'web_list' => [
+            // check the important boxes right away
+            'bigControlPanel' => '1',
+            'clipBoard' => '1',
+            'localization' => '1',
+            'showPalettes' => '1',
+        ], 'web_ts' => [
+            // not "constant editor" but "object browser"
+            'function' => 'TYPO3\CMS\Tstemplate\Controller\TypoScriptTemplateObjectBrowserModuleFunctionController',
+            // better defaults for immediate debugging the actual typoscript
+            'ts_browser_type' => 'setup',
+            'ts_browser_const' => 'subst',
+            'ts_browser_fixedLgd' => '0',
+            'ts_browser_showComments' => '1',
+        ], 'file_list' => ['bigControlPanel' => '1', 'clipBoard' => '1', 'localization' => '1', 'showPalettes' => '1']]];
         $uc = serialize($uc);
 
         try {
@@ -285,7 +266,7 @@ class BeUserCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             } else {
                 $this->output->writeln('<p>User successfully added to "' . $database . '"</p>');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->output->writeln('<p-error>User adding failed</p-error>');
         }
     }

@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConnectionsCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:connections';
     /**
      * Configure command
      */
@@ -35,7 +36,7 @@ class ConnectionsCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:connections')
+        $this
              ->setDescription('List current connections');
     }
 

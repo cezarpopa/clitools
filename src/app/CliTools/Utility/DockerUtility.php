@@ -32,7 +32,7 @@ class DockerUtility
      *
      * @var array
      */
-    static protected $dockerConfigurationCache = array();
+    static protected $dockerConfigurationCache = [];
 
     /**
      * Lookup ID of docker-compose container
@@ -90,7 +90,7 @@ class DockerUtility
         }
 
         // Build command
-        $command = new CommandBuilder('docker', 'inspect %s 2> /dev/null', array($container));
+        $command = new CommandBuilder('docker', 'inspect %s 2> /dev/null', [$container]);
 
         // execute
         $executor = new Executor($command);
@@ -105,9 +105,9 @@ class DockerUtility
 
             // Parse env
             if (!empty($conf->Config->Env)) {
-                $envList = array();
+                $envList = [];
                 foreach ($conf->Config->Env as $value) {
-                    list($envName, $envValue) = explode('=', $value, 2);
+                    [$envName, $envValue] = explode('=', (string) $value, 2);
                     $envList[$envName] = $envValue;
                 }
 
@@ -148,9 +148,7 @@ class DockerUtility
             $path = getcwd();
         }
 
-        $dockerFileList = array(
-            'docker-compose.yml'
-        );
+        $dockerFileList = ['docker-compose.yml'];
 
         foreach ($dockerFileList as $dockerFile) {
             $filePath = $path . '/' . $dockerFile;
@@ -194,11 +192,7 @@ class DockerUtility
      */
     public static function getDockerInstanceName($containerName, $containerNumber = 1, $path = null)
     {
-        $dockerName = array(
-            \CliTools\Utility\DockerUtility::getDockerInstancePrefix($path),
-            (string)$containerName,
-            (int)$containerNumber,
-        );
+        $dockerName = [\CliTools\Utility\DockerUtility::getDockerInstancePrefix($path), (string)$containerName, (int)$containerNumber];
 
         return implode('_', $dockerName);
     }

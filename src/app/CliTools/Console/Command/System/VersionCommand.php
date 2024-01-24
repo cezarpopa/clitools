@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Database\DatabaseConnection;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\UnixUtility;
@@ -28,15 +29,16 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class VersionCommand extends \CliTools\Console\Command\AbstractCommand
+class VersionCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:version';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:version')
+        $this
              ->setDescription('List common version');
     }
 
@@ -51,24 +53,18 @@ class VersionCommand extends \CliTools\Console\Command\AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $versionList = array();
+        $versionList = [];
 
         // ############################
         // System (LSB Version)
         // ############################
-        $versionRow    = array(
-            'system'  => 'System',
-            'version' => UnixUtility::lsbSystemDescription(),
-        );
+        $versionRow    = ['system'  => 'System', 'version' => UnixUtility::lsbSystemDescription()];
         $versionList[] = array_values($versionRow);
 
         // ############################
         // PHP
         // ############################
-        $versionList[] = array(
-            'PHP',
-            phpversion()
-        );
+        $versionList[] = ['PHP', phpversion()];
 
         // ############################
         // MySQL
@@ -76,18 +72,12 @@ class VersionCommand extends \CliTools\Console\Command\AbstractCommand
         $query      = 'SHOW VARIABLES LIKE \'version\'';
         $versionRow = DatabaseConnection::getList($query);
 
-        $versionList[] = array(
-            'MySQL',
-            $versionRow['version']
-        );
+        $versionList[] = ['MySQL', $versionRow['version']];
 
         // ############################
         // Apache
         // ############################
-        $versionRow = array(
-            'system'  => 'Apache',
-            'version' => 'Unknown',
-        );
+        $versionRow = ['system'  => 'Apache', 'version' => 'Unknown'];
 
         $command = new CommandBuilder('apache2ctl', '-v');
         $command->setOutputRedirect(CommandBuilder::OUTPUT_REDIRECT_NO_STDERR);
@@ -95,8 +85,8 @@ class VersionCommand extends \CliTools\Console\Command\AbstractCommand
                               ->getOutput();
 
         foreach ($execOutput as $execOutputLine) {
-            if (strpos($execOutputLine, ':') !== false) {
-                list($tmpKey, $tmpVersion) = explode(':', trim($execOutputLine), 2);
+            if (str_contains((string) $execOutputLine, ':')) {
+                [$tmpKey, $tmpVersion] = explode(':', trim((string) $execOutputLine), 2);
 
                 switch (strtolower($tmpKey)) {
                     case 'server version':
@@ -111,27 +101,21 @@ class VersionCommand extends \CliTools\Console\Command\AbstractCommand
         // ############################
         // Docker
         // ############################
-        $versionRow    = array(
-            'system'  => 'Docker',
-            'version' => \CliTools\Utility\UnixUtility::dockerVersion(),
-        );
+        $versionRow    = ['system'  => 'Docker', 'version' => \CliTools\Utility\UnixUtility::dockerVersion()];
         $versionList[] = array_values($versionRow);
 
         // ############################
         // CliTools
         // ############################
 
-        $versionList[] = array(
-            'CliTools',
-            CLITOOLS_COMMAND_VERSION
-        );
+        $versionList[] = ['CliTools', CLITOOLS_COMMAND_VERSION];
 
         // ########################
         // Output
         // ########################
         /** @var \Symfony\Component\Console\Helper\Table $table */
         $table = new Table($output);
-        $table->setHeaders(array('System', 'Version'));
+        $table->setHeaders(['System', 'Version']);
 
         foreach ($versionList as $versionRow) {
             $table->addRow(array_values($versionRow));

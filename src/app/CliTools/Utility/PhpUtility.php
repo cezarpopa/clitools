@@ -78,7 +78,7 @@ class PhpUtility
      */
     public static function uniqueName($salt = null)
     {
-        $ret = microtime(true) . '#' . $salt . '#' . rand(0,1000000);
+        $ret = microtime(true) . '#' . $salt . '#' . random_int(0,1_000_000);
         $ret = sha1($ret);
         $ret = substr($ret, 5, 12);
         return $ret;
@@ -193,7 +193,7 @@ class PhpUtility
             $dumpFileInfo = finfo_file($finfo, $file);
             finfo_close($finfo);
 
-            if (strpos($dumpFileInfo, 'LZMA compressed data') !== false) {
+            if (str_contains($dumpFileInfo, 'LZMA compressed data')) {
                 $ret = 'application/x-lzma';
             }
         }
@@ -225,9 +225,7 @@ class PhpUtility
         $ret = array_map('trim', explode((string)$delimiter, (string)$value));
 
         if ($noEmpty) {
-            $ret = array_filter($ret, function ($val) {
-                return strlen($val) !== 0;
-            });
+            $ret = array_filter($ret, fn($val) => strlen((string) $val) !== 0);
         }
 
         return $ret;

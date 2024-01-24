@@ -32,6 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class BackupCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:backup';
     /**
      * Configure command
      */
@@ -39,7 +40,7 @@ class BackupCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:backup')
+        $this
              ->setDescription('Backup database')
             ->addOption(
                 'port',
@@ -94,7 +95,7 @@ class BackupCommand extends AbstractCommand
 
         $output->writeln('<h2>Dumping database "' . $database . '" into file "' . $dumpFile . '"</h2>');
 
-        $fileExt = pathinfo($dumpFile, PATHINFO_EXTENSION);
+        $fileExt = pathinfo((string) $dumpFile, PATHINFO_EXTENSION);
 
         $commandCompressor = null;
 

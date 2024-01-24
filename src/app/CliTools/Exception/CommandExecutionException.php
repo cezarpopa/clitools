@@ -72,8 +72,6 @@ class CommandExecutionException extends \RuntimeException
 
     /**
      * Set command
-     *
-     * @param CommandBuilderInterface $command
      */
     public function setCommand(CommandBuilderInterface $command)
     {

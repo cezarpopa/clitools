@@ -21,19 +21,21 @@ namespace CliTools\Console\Command\Common;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FixRightsCommand extends \CliTools\Console\Command\AbstractCommand
+class FixRightsCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'fix-rights';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('fix-rights')
+        $this
              ->setDescription('Fix rights of multiple directories and files')
              ->addArgument(
                  'path',
@@ -75,8 +77,6 @@ class FixRightsCommand extends \CliTools\Console\Command\AbstractCommand
 
     /**
      * Set rights for file
-     *
-     * @param \SplFileInfo $file
      */
     protected function setRights(\SplFileInfo $file)
     {

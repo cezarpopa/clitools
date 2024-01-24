@@ -21,14 +21,16 @@ namespace CliTools\Console\Command\TYPO3;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\Mysql\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
+class DomainCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:domain';
     /**
      * Configure command
      */
@@ -36,7 +38,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
     {
         parent::configure();
 
-        $this->setName('typo3:domain')
+        $this
              ->setDescription('Add common development domains to database')
              ->addArgument(
                  'db',
@@ -160,7 +162,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
      */
     protected function removeDomains($dbName, $pattern)
     {
-        $pattern = str_replace('*', '%', $pattern);
+        $pattern = str_replace('*', '%', (string) $pattern);
 
         $query = 'DELETE FROM ' . $dbName . '.sys_domain WHERE domainName LIKE %s';
         $query = sprintf($query, $this->mysqlQuote($pattern));
@@ -193,7 +195,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             $templateConf = $row['template_config'];
 
             // Remove old baseURL entries (no duplciates)
-            $templateConf = preg_replace('/^config.baseURL = .*$/m', '', $templateConf);
+            $templateConf = preg_replace('/^config.baseURL = .*$/m', '', (string) $templateConf);
             $templateConf = trim($templateConf);
 
             // Add new baseURL
@@ -224,7 +226,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             $domainName = $domain['domainName'];
 
             // remove development suffix
-            $domainName = preg_replace('/' . preg_quote($devDomain) . '$/', '', $domainName);
+            $domainName = preg_replace('/' . preg_quote($devDomain) . '$/', '', (string) $domainName);
 
             // add share domain
             $domainName .= '.' . ltrim($suffix, '.');
@@ -235,7 +237,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             $table = 'sys_domain';
             $fieldList = array_keys($domain);
 
-            $valueList = array();
+            $valueList = [];
             foreach ($domain as $value) {
                 $valueList[] = $this->mysqlQuote($value);
             }
@@ -281,7 +283,7 @@ class DomainCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
             $devDomain = $this->input->getOption('suffix');
         }
 
-        $domainLength = strlen($devDomain);
+        $domainLength = strlen((string) $devDomain);
 
         // ##################
         // Fix domains

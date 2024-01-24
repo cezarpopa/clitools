@@ -26,6 +26,7 @@ use CliTools\Shell\CommandBuilder\OutputCombineCommandBuilder;
 class BackupCommand extends AbstractShareCommand
 {
 
+    protected static $defaultName = 'share:backup';
     /**
      * Configure command
      */
@@ -33,7 +34,7 @@ class BackupCommand extends AbstractShareCommand
     {
         parent::configure();
 
-        $this->setName('share:backup')
+        $this
              ->setDescription('Backup files and database from share');
     }
 
@@ -102,7 +103,7 @@ class BackupCommand extends AbstractShareCommand
         // ##################
         foreach ($this->contextConfig->getArray('mysql.database') as $database) {
             // make sure we don't have any leading whitespaces
-            $database = trim($database);
+            $database = trim((string) $database);
 
             // dump database
             $dumpFile = $this->tempDir . '/mysql/' . $database . '.dump';

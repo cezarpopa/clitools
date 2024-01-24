@@ -21,6 +21,8 @@ namespace CliTools\Shell\CommandBuilder;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Phar;
+
 class SelfCommandBuilder extends CommandBuilder
 {
 
@@ -34,7 +36,7 @@ class SelfCommandBuilder extends CommandBuilder
         $arguments = $_SERVER['argv'];
 
         // Check if command is run inside PHAR
-        if (\Phar::running()) {
+        if (Phar::running()) {
             // PHAR version
             $this->setCommand(array_shift($arguments));
         } elseif (!empty($_SERVER['_'])) {

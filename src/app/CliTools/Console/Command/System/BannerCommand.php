@@ -21,15 +21,17 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
+use CliTools\Console\Filter\OnlyRootFilterInterface;
 use CliTools\Utility\FormatUtility;
 use CliTools\Utility\UnixUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BannerCommand extends \CliTools\Console\Command\AbstractCommand implements
-    \CliTools\Console\Filter\OnlyRootFilterInterface
+class BannerCommand extends AbstractCommand implements OnlyRootFilterInterface
 {
 
+    protected static $defaultName = 'system:banner';
     /**
      * Enable automatic terminal title
      *
@@ -42,7 +44,7 @@ class BannerCommand extends \CliTools\Console\Command\AbstractCommand implements
      */
     protected function configure()
     {
-        $this->setName('system:banner')
+        $this
              ->setDescription('Banner generator for /etc/issue');
     }
 
@@ -111,10 +113,10 @@ class BannerCommand extends \CliTools\Console\Command\AbstractCommand implements
      */
     protected function generateSystemInfo()
     {
-        $ret = array();
+        $ret = [];
 
-        $leftCol  = array();
-        $rightCol = array();
+        $leftCol  = [];
+        $rightCol = [];
 
         // ##################
         // Left: System info
@@ -243,7 +245,7 @@ class BannerCommand extends \CliTools\Console\Command\AbstractCommand implements
                 } else {
                     throw new \RuntimeException('Mailcheck failed');
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $ret = 'error';
             }
         }
@@ -265,7 +267,7 @@ class BannerCommand extends \CliTools\Console\Command\AbstractCommand implements
     protected function buildMailboxServerString(array $mailboxConf)
     {
         $hostname = $mailboxConf['host'];
-        $path     = ltrim($mailboxConf['path'],'/');
+        $path     = ltrim((string) $mailboxConf['path'],'/');
 
         switch ($mailboxConf['scheme']) {
             case 'imap-insecure':

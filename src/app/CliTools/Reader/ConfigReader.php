@@ -29,7 +29,7 @@ class ConfigReader implements \ArrayAccess
      *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * Constructor
@@ -77,7 +77,7 @@ class ConfigReader implements \ArrayAccess
         $ret = $this->getNode($path);
 
         if (!is_array($ret)) {
-            $ret = array();
+            $ret = [];
         }
 
         return $ret;
@@ -97,7 +97,7 @@ class ConfigReader implements \ArrayAccess
         if (is_array($ret)) {
             $ret = array_keys($ret);
         } else {
-            $ret = array();
+            $ret = [];
         }
 
         return $ret;
@@ -109,7 +109,7 @@ class ConfigReader implements \ArrayAccess
      * @param string $path  Path to node (eg. foo.bar.baz)
      * @param mixed  $value Value to set
      */
-    public function set($path, $value)
+    public function set($path, mixed $value)
     {
         $node =& $this->getNode($path);
         $node = $value;
@@ -175,7 +175,7 @@ class ConfigReader implements \ArrayAccess
      * @param string $offset Array key
      * @param mixed  $value  Value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, mixed $value)
     {
         if ($offset === null) {
             $this->data[] = $value;
@@ -215,7 +215,7 @@ class ConfigReader implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
+        return $this->data[$offset] ?? null;
     }
 
 }

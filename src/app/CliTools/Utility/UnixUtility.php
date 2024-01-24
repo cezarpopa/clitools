@@ -114,7 +114,7 @@ abstract class UnixUtility
                                ->getOutputString();
 
             $ret = trim($ret);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // no docker found?!
         }
 
@@ -136,9 +136,9 @@ abstract class UnixUtility
         $execOutput = $command->execute()
                               ->getOutput();
 
-        $ret = array();
+        $ret = [];
         foreach ($execOutput as $line) {
-            list($disc, $capacity, $free, $usage) = explode(' ', $line);
+            [$disc, $capacity, $free, $usage] = explode(' ', (string) $line);
             $ret[$disc]['capacity'] = $capacity * 1024;
             $ret[$disc]['free']     = $free * 1024;
             $ret[$disc]['usage']    = $usage;
@@ -159,7 +159,7 @@ abstract class UnixUtility
     {
         $sysDir = '/sys/class/net/';
 
-        $netInterfaceList = array();
+        $netInterfaceList = [];
         $dirIterator      = new \DirectoryIterator($sysDir);
         foreach ($dirIterator as $dirEntry) {
             /** @var \DirectoryIterator $dirEntry */
@@ -170,7 +170,7 @@ abstract class UnixUtility
             }
 
             // skip virtual interfaces
-            if (strpos($dirEntry->getFilename(), 'veth') === 0) {
+            if (str_starts_with($dirEntry->getFilename(), 'veth')) {
                 continue;
             }
 
@@ -184,7 +184,7 @@ abstract class UnixUtility
             }
 
             if (!empty($interfaceName) && $dirEntry->isDir()) {
-                $netInterfaceList[$interfaceName] = array();
+                $netInterfaceList[$interfaceName] = [];
             }
         }
 
@@ -192,7 +192,7 @@ abstract class UnixUtility
         unset($netInterfaceList['lo']);
 
         foreach ($netInterfaceList as $netName => &$netConf) {
-            $command              = new CommandBuilder('ifdata', '-pa %s', array($netName));
+            $command              = new CommandBuilder('ifdata', '-pa %s', [$netName]);
             $netConf['ipaddress'] = trim(
                 $command->execute()
                         ->getOutputString()
@@ -265,7 +265,7 @@ abstract class UnixUtility
     public static function checkExecutable($command)
     {
 
-        if (strpos($command, '/') !== false) {
+        if (str_contains($command, '/')) {
             // command with path
             if (file_exists($command) && is_executable($command)) {
                 return true;
@@ -332,26 +332,26 @@ abstract class UnixUtility
         // Check if we can reload tty
         try {
             $who = new CommandBuilder('who');
-            $who->addPipeCommand(new CommandBuilder('grep', '%s', array($ttyName)));
+            $who->addPipeCommand(new CommandBuilder('grep', '%s', [$ttyName]));
             $who->execute();
             // if there is no exception -> there is a logged in user
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // if there is an exception -> there is NO logged in user
 
             try {
                 $ps = new CommandBuilder('ps', 'h -o pid,comm,args -C getty');
-                $ps->addPipeCommand(new CommandBuilder('grep', '%s', array($ttyName)));
+                $ps->addPipeCommand(new CommandBuilder('grep', '%s', [$ttyName]));
                 $output = $ps->execute()
                              ->getOutput();
 
                 if (!empty($output)) {
-                    $outputLine      = trim(reset($output));
+                    $outputLine      = trim((string) reset($output));
                     $outputLineParts = preg_split('/[\s]+/', $outputLine);
-                    list($pid) = $outputLineParts;
+                    [$pid] = $outputLineParts;
 
                     posix_kill($pid, SIGHUP);
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
     }

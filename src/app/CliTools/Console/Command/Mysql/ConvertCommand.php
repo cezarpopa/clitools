@@ -30,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConvertCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:convert';
     /**
      * Configure command
      */
@@ -37,7 +38,7 @@ class ConvertCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:convert')
+        $this
              ->setDescription('Convert charset/collation of a database')
              ->addArgument(
                  'database',
@@ -99,7 +100,7 @@ class ConvertCommand extends AbstractCommand
         $query = 'ALTER DATABASE %s CHARACTER SET %s COLLATE %s';
         $query = sprintf(
             $query,
-            addslashes($database),
+            addslashes((string) $database),
             addslashes($charset),
             addslashes($collation)
         );

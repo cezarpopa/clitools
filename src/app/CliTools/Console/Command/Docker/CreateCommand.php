@@ -33,12 +33,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CreateCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:create';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:create')
+        $this
              ->setDescription('Create new docker boilerplate')
              ->addArgument(
                  'path',
@@ -200,7 +201,7 @@ class CreateCommand extends AbstractCommand
     {
         $this->setTerminalTitle('Cloning docker');
 
-        $command = new CommandBuilder('git', 'clone --branch=master --recursive %s %s', array($repo, $path));
+        $command = new CommandBuilder('git', 'clone --branch=master --recursive %s %s', [$repo, $path]);
         $command->executeInteractive();
     }
 
@@ -231,7 +232,7 @@ class CreateCommand extends AbstractCommand
                     ->executeInteractive();
         }
 
-        $command = new CommandBuilder('git', 'clone --branch=master --recursive %s %s', array($repo, $path));
+        $command = new CommandBuilder('git', 'clone --branch=master --recursive %s %s', [$repo, $path]);
         $command->executeInteractive();
     }
 
@@ -267,7 +268,7 @@ class CreateCommand extends AbstractCommand
                 $line = preg_replace(
                     '/^[\s]*DOCUMENT_ROOT[\s]*=code\/?[\s]*$/ms',
                     'DOCUMENT_ROOT=' . $documentRoot,
-                    $line
+                    (string) $line
                 );
             }
             unset($line);

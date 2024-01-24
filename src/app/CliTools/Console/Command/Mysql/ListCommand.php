@@ -31,6 +31,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ListCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:list';
     /**
      * Configure command
      */
@@ -38,7 +39,7 @@ class ListCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:list')
+        $this
              ->setDescription('List all databases')
              ->addOption(
                  'sort-name',
@@ -82,9 +83,7 @@ class ListCommand extends AbstractCommand
         if (!empty($databaseList)) {
 
             $rekeyCallback = function($array, $singleValue = false) {
-                $keyList = array_map(function($v) {
-                    return $v[0];
-                },$array);
+                $keyList = array_map(fn($v) => $v[0],$array);
 
                 $valueList = array_map(function($v) use ($singleValue) {
                     if ($singleValue) {
@@ -126,16 +125,12 @@ class ListCommand extends AbstractCommand
             $statsRowList = $this->execSqlQuery($query, false);
             $statsRowList = $rekeyCallback($statsRowList);
 
-            $databaseRowList = array();
+            $databaseRowList = [];
             foreach ($databaseList as $database) {
                 $tableCount = 0;
                 $viewCount = 0;
 
-                $statsRow = array(
-                    1 => 0,
-                    2 => 0,
-                    3 => 0,
-                );
+                $statsRow = [1 => 0, 2 => 0, 3 => 0];
 
                 if (!empty($tableCountList[$database])) {
                     $tableCount = $tableCountList[$database];
@@ -149,14 +144,7 @@ class ListCommand extends AbstractCommand
                     $statsRow = $statsRowList[$database];
                 }
 
-                $databaseRowList[$database] = array(
-                    'name'        => $database,
-                    'table_count' => $tableCount,
-                    'view_count'  => $viewCount,
-                    'data_size'   => $statsRow[1],
-                    'index_size'  => $statsRow[2],
-                    'total_size'  => $statsRow[3],
-                );
+                $databaseRowList[$database] = ['name'        => $database, 'table_count' => $tableCount, 'view_count'  => $viewCount, 'data_size'   => $statsRow[1], 'index_size'  => $statsRow[2], 'total_size'  => $statsRow[3]];
             }
 
 
@@ -167,18 +155,14 @@ class ListCommand extends AbstractCommand
             // Sort: default by name (natural sort)
             uasort(
                 $databaseRowList,
-                function ($a, $b) {
-                    return strnatcmp($a['name'], $b['name']);
-                }
+                fn($a, $b) => strnatcmp((string) $a['name'], (string) $b['name'])
             );
 
             // Sort: by table names
             if ($input->getOption('sort-name')) {
                 uasort(
                     $databaseRowList,
-                    function ($a, $b) {
-                        return $a['table_count'] < $b['table_count'];
-                    }
+                    fn($a, $b) => $a['table_count'] < $b['table_count']
                 );
             }
 
@@ -186,9 +170,7 @@ class ListCommand extends AbstractCommand
             if ($input->getOption('sort-data')) {
                 uasort(
                     $databaseRowList,
-                    function ($a, $b) {
-                        return $a['data_size'] < $b['data_size'];
-                    }
+                    fn($a, $b) => $a['data_size'] < $b['data_size']
                 );
             }
 
@@ -196,9 +178,7 @@ class ListCommand extends AbstractCommand
             if ($input->getOption('sort-index')) {
                 uasort(
                     $databaseRowList,
-                    function ($a, $b) {
-                        return $a['index_size'] < $b['index_size'];
-                    }
+                    fn($a, $b) => $a['index_size'] < $b['index_size']
                 );
             }
 
@@ -206,9 +186,7 @@ class ListCommand extends AbstractCommand
             if ($input->getOption('sort-total')) {
                 uasort(
                     $databaseRowList,
-                    function ($a, $b) {
-                        return $a['total_size'] < $b['total_size'];
-                    }
+                    fn($a, $b) => $a['total_size'] < $b['total_size']
                 );
             }
 
@@ -216,14 +194,7 @@ class ListCommand extends AbstractCommand
             // Stats
             // ########################
 
-            $statsRow      = array(
-                'name'        => '',
-                'table_count' => 0,
-                'view_count'  => 0,
-                'data_size'   => 0,
-                'index_size'  => 0,
-                'total_size'  => 0,
-            );
+            $statsRow      = ['name'        => '', 'table_count' => 0, 'view_count'  => 0, 'data_size'   => 0, 'index_size'  => 0, 'total_size'  => 0];
             $databaseCount = count($databaseRowList);
 
             foreach ($databaseRowList as $databaseRow) {
@@ -241,7 +212,7 @@ class ListCommand extends AbstractCommand
 
             /** @var \Symfony\Component\Console\Helper\Table $table */
             $table = new Table($output);
-            $table->setHeaders(array('Database', 'Tables', 'Views', 'Data', 'Index', 'Total'));
+            $table->setHeaders(['Database', 'Tables', 'Views', 'Data', 'Index', 'Total']);
 
             foreach ($databaseRowList as $databaseRow) {
 
@@ -258,7 +229,7 @@ class ListCommand extends AbstractCommand
             // Stats: average
             if ($databaseCount >= 1) {
                 $table->addRow(new TableSeparator());
-                $statsAvgRow                = array();
+                $statsAvgRow                = [];
                 $statsAvgRow['name']        = 'Average';
                 $statsAvgRow['table_count'] = FormatUtility::number($statsRow['table_count'] / $databaseCount);
                 $statsAvgRow['view_count']  = FormatUtility::number($statsRow['view_count'] / $databaseCount);

@@ -21,14 +21,16 @@ namespace CliTools\Console\Command\TYPO3;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\Mysql\AbstractCommand;
 use CliTools\Database\DatabaseConnection;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
+class CleanupCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:cleanup';
     /**
      * Configure command
      */
@@ -36,7 +38,7 @@ class CleanupCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
     {
         parent::configure();
 
-        $this->setName('typo3:cleanup')
+        $this
              ->setDescription('Cleanup caches, logs and indexed search')
              ->addArgument(
                  'db',
@@ -104,7 +106,7 @@ class CleanupCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
      */
     protected function cleanupTypo3Database($database)
     {
-        $cleanupTableList = array();
+        $cleanupTableList = [];
 
         // Check if database is TYPO3 instance
         $tableList = $this->mysqlTableList($database);
@@ -114,14 +116,14 @@ class CleanupCommand extends \CliTools\Console\Command\Mysql\AbstractCommand
 
             // Caching und indexing tables
             switch (true) {
-                case (strpos($table, 'cache_') === 0):
-                case (strpos($table, 'cachingframework_') === 0):
-                case (strpos($table, 'cf_') === 0):
+                case (str_starts_with((string) $table, 'cache_')):
+                case (str_starts_with((string) $table, 'cachingframework_')):
+                case (str_starts_with((string) $table, 'cf_')):
                     // Caching framework
                     $clearTable = true;
                     break;
 
-                case (strpos($table, 'index_') === 0):
+                case (str_starts_with((string) $table, 'index_')):
                     // EXT:indexed_search
                     $clearTable = true;
                     break;

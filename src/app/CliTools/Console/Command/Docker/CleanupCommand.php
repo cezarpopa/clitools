@@ -29,12 +29,13 @@ use Symfony\Component\Console\Input\InputOption;
 class CleanupCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:cleanup';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:cleanup')
+        $this
             ->setDescription('Cleanup docker environment')
             ->addOption(
                 'force',
@@ -84,7 +85,7 @@ class CleanupCommand extends AbstractCommand
                 $this->output->writeln('<p>No images for cleanup found</p>');
             }
 
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->output->writeln('<comment>Some images could not be removed (this is normal)</comment>');
         }
 
@@ -116,7 +117,7 @@ class CleanupCommand extends AbstractCommand
              } else {
                  $this->output->writeln('<p>No volumes for cleanup found</p>');
              }
-         } catch (\Exception $e) {
+         } catch (\Exception) {
              $this->output->writeln('<comment>Some volumes could not be removed (this is normal)</comment>');
          }
 

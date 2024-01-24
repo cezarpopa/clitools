@@ -21,19 +21,21 @@ namespace CliTools\Console\Command\Docker;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Filter\AnyParameterFilterInterface;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ComposeCommand extends AbstractCommand implements \CliTools\Console\Filter\AnyParameterFilterInterface
+class ComposeCommand extends AbstractCommand implements AnyParameterFilterInterface
 {
 
+    protected static $defaultName = 'docker:compose';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:compose')
+        $this
              ->setDescription('Run general docker-compose command in docker container');
     }
 

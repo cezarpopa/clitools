@@ -28,12 +28,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class IftopCommand extends \CliTools\Console\Command\AbstractCommand
 {
 
+    protected static $defaultName = 'docker:iftop';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:iftop')
+        $this
              ->setDescription('Exec iftop for Docker');
     }
 
@@ -52,7 +53,7 @@ class IftopCommand extends \CliTools\Console\Command\AbstractCommand
         $dockerInterface = $this->getApplication()
                                 ->getConfigValue('docker', 'interface');
 
-        $command = new CommandBuilder('iftop', '-i %s', array($dockerInterface));
+        $command = new CommandBuilder('iftop', '-i %s', [$dockerInterface]);
         $command->executeInteractive();
 
         return 0;

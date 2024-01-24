@@ -21,22 +21,24 @@ namespace CliTools\Console\Command\Common;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
+use CliTools\Console\Filter\AnyParameterFilterInterface;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\PhpUtility;
 use CliTools\Utility\UnixUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeCommand extends \CliTools\Console\Command\AbstractCommand implements
-    \CliTools\Console\Filter\AnyParameterFilterInterface
+class MakeCommand extends AbstractCommand implements AnyParameterFilterInterface
 {
 
+    protected static $defaultName = 'make';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('make')
+        $this
              ->setDescription('Search Makefile updir and start makefile');
     }
 

@@ -21,19 +21,21 @@ namespace CliTools\Console\Command\Php;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RestartCommand extends \CliTools\Console\Command\AbstractCommand
+class RestartCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'php:restart';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('php:restart')
+        $this
              ->setDescription('Restart PHP FPM');
     }
 

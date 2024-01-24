@@ -31,12 +31,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ShellCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:shell';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:shell')
+        $this
              ->setDescription('Enter shell in docker container')
              ->addArgument(
                  'container',
@@ -82,7 +83,7 @@ class ShellCommand extends AbstractCommand
 
         if (!empty($cliUser)) {
             // su wrapping as cli user
-            $commandSu = new RemoteCommandBuilder('su', '-l %s -m', array($cliUser));
+            $commandSu = new RemoteCommandBuilder('su', '-l %s -m', [$cliUser]);
             $commandSu->addArgumentTemplate('-c "TERM=%s %s"', getenv('TERM'), $command);
             $command = $commandSu;
         }

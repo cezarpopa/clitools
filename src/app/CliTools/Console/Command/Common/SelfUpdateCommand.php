@@ -21,21 +21,23 @@ namespace CliTools\Console\Command\Common;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Service\SelfUpdateService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SelfUpdateCommand extends \CliTools\Console\Command\AbstractCommand
+class SelfUpdateCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'self-update';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('self-update')
-             ->setAliases(array('selfupdate'))
+        $this
+             ->setAliases(['selfupdate'])
              ->setDescription(
                  'Self update of CliTools Command'
              )

@@ -36,28 +36,21 @@ class Application extends \Symfony\Component\Console\Application
      *
      * @var array
      */
-    protected $config = array(
-        'config'   => array(),
-        'commands' => array(
-            'class'  => array(),
-            'ignore' => array(),
-        ),
-        '_files'   => array(),
-    );
+    protected $config = ['config'   => [], 'commands' => ['class'  => [], 'ignore' => []], '_files'   => []];
 
     /**
      * Configuration files
      *
      * @var array
      */
-    protected $configFiles = array();
+    protected $configFiles = [];
 
     /**
      * Tear down funcs
      *
      * @var array
      */
-    protected $tearDownFuncList = array();
+    protected $tearDownFuncList = [];
 
     /**
      * @var SettingsService
@@ -112,8 +105,6 @@ class Application extends \Symfony\Component\Console\Application
 
     /**
      * Register tear down callback
-     *
-     * @param callable $func
      */
     public function registerTearDown(callable $func)
     {
@@ -128,7 +119,7 @@ class Application extends \Symfony\Component\Console\Application
         foreach ($this->tearDownFuncList as $func) {
             call_user_func($func);
         }
-        $this->tearDownFuncList = array();
+        $this->tearDownFuncList = [];
 
         if ($this->settingsService) {
             $this->settingsService->store();
@@ -197,7 +188,7 @@ class Application extends \Symfony\Component\Console\Application
 
         $style = new OutputFormatterStyle();
         $style->setApplication($this);
-        $style->setWrap('-', '-');
+        $style->setWrap('-');
         $output->getFormatter()
                ->setStyle('h1', $style);
 
@@ -247,12 +238,8 @@ class Application extends \Symfony\Component\Console\Application
      */
     protected function initializeErrorHandler()
     {
-        $errorHandler = function ($errno, $errstr, $errfile, $errline) {
-            $msg = array(
-                'Message: ' . $errstr,
-                'File: ' . $errfile,
-                'Line: ' . $errline,
-            );
+        $errorHandler = function ($errno, $errstr, $errfile, $errline): never {
+            $msg = ['Message: ' . $errstr, 'File: ' . $errfile, 'Line: ' . $errline];
 
             $msg = implode("\n", $msg);
 
@@ -314,7 +301,7 @@ class Application extends \Symfony\Component\Console\Application
                     // check OnlyRoot filter
                     if (!$isRunningAsRoot && is_subclass_of(
                             $class,
-                            '\CliTools\Console\Filter\OnlyRootFilterInterface'
+                            \CliTools\Console\Filter\OnlyRootFilterInterface::class
                         )
                     ) {
                         // class only useable for root
@@ -340,11 +327,11 @@ class Application extends \Symfony\Component\Console\Application
         foreach ($this->config['commands']['ignore'] as $exclude) {
 
             // Check if there is any wildcard and generate regexp for it
-            if (strpos($exclude, '*') !== false) {
-                $regExp = '/' . preg_quote($exclude, '/') . '/i';
+            if (str_contains((string) $exclude, '*')) {
+                $regExp = '/' . preg_quote((string) $exclude, '/') . '/i';
                 $regExp = str_replace('\\*', '.*', $regExp);
 
-                if (preg_match($regExp, $class)) {
+                if (preg_match($regExp, (string) $class)) {
                     return false;
                 }
             } elseif ($class === $exclude) {
@@ -357,11 +344,11 @@ class Application extends \Symfony\Component\Console\Application
         foreach ($this->config['commands']['exclude'] as $exclude) {
 
             // Check if there is any wildcard and generate regexp for it
-            if (strpos($exclude, '*') !== false) {
-                $regExp = '/' . preg_quote($exclude, '/') . '/i';
+            if (str_contains((string) $exclude, '*')) {
+                $regExp = '/' . preg_quote((string) $exclude, '/') . '/i';
                 $regExp = str_replace('\\*', '.*', $regExp);
 
-                if (preg_match($regExp, $class)) {
+                if (preg_match($regExp, (string) $class)) {
                     return false;
                 }
             } elseif ($class === $exclude) {

@@ -21,21 +21,23 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Service\SelfUpdateService;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
+class UpdateCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:update';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:update')
-             ->setAliases(array('update'))
+        $this
+             ->setAliases(['update'])
              ->setDescription('Update system');
     }
 
@@ -96,7 +98,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
                 $command = new \CliTools\Shell\CommandBuilder\SelfCommandBuilder();
                 $command->addArgument('user:rebuildsshconfig');
                 $command->executeInteractive();
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException) {
                 $msg = 'Running git update of ' . $reposDirectory . '... FAILED';
                 $output->writeln('<error>' . $msg . '</error>');
             }
@@ -115,7 +117,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
      */
     protected function systemUpdate(InputInterface $input, OutputInterface $output)
     {
-        $errorMsgList = array();
+        $errorMsgList = [];
 
         // ##################
         // System update
@@ -147,7 +149,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
             $this->outputBlock($output, 'Running clitools update');
             $updateService = new SelfUpdateService($this->getApplication(), $output);
             $updateService->update();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             $msg = 'Running clitools update... FAILED';
             $output->writeln('<error>' . $msg . '</error>');
             $errorMsgList[] = $msg;
@@ -161,7 +163,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
 
             $command = new CommandBuilder('composer', 'self-update');
             $command->executeInteractive();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             $msg = 'Running composer update... FAILED';
             $output->writeln('<error>' . $msg . '</error>');
             $errorMsgList[] = $msg;
@@ -175,7 +177,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
 
             $command = new CommandBuilder('box.phar', 'update');
             $command->executeInteractive();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             $msg = 'Running box.phar update... FAILED';
             $output->writeln('<error>' . $msg . '</error>');
             $errorMsgList[] = $msg;
@@ -213,7 +215,7 @@ class UpdateCommand extends \CliTools\Console\Command\AbstractCommand
      */
     protected function outputBlock($output, $msg)
     {
-        list($termWidth) = $this->getApplication()
+        [$termWidth] = $this->getApplication()
                                 ->getTerminalDimensions();
         $separator = '<info>' . str_repeat('-', $termWidth) . '</info>';
 

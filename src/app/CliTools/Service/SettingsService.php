@@ -36,7 +36,7 @@ class SettingsService
      *
      * @var array
      */
-    protected $values = array();
+    protected $values = [];
 
     /**
      * Constructor
@@ -53,7 +53,7 @@ class SettingsService
      * @param string $key   Setting key
      * @param mixed  $value Value
      */
-    public function set($key, $value)
+    public function set($key, mixed $value)
     {
         $this->values[$key] = $value;
     }

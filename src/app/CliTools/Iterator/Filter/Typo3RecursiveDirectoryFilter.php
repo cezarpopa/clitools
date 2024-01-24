@@ -29,23 +29,7 @@ class Typo3RecursiveDirectoryFilter extends \CliTools\Iterator\Filter\RecursiveD
      *
      * @var array
      */
-    protected $ignoreDirectoryList = array(
-        'shared',
-        'fileadmin',
-        'typo3temp',
-        't3lib',
-        'typo3_src',
-        'typo3src',
-        'typo3conf',
-        'typo3',
-        'piwik',
-        'cache',
-        'tests',
-        'classes',
-        'uploads',
-        'configuration',
-        'resources',
-    );
+    protected $ignoreDirectoryList = ['shared', 'fileadmin', 'typo3temp', 't3lib', 'typo3_src', 'typo3src', 'typo3conf', 'typo3', 'piwik', 'cache', 'tests', 'classes', 'uploads', 'configuration', 'resources'];
 
     /**
      * Filter for directories

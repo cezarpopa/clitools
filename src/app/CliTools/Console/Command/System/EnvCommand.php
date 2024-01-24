@@ -21,19 +21,21 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EnvCommand extends \CliTools\Console\Command\AbstractCommand
+class EnvCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:env';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:env')
+        $this
              ->setDescription('List environment variables');
     }
 
@@ -48,16 +50,9 @@ class EnvCommand extends \CliTools\Console\Command\AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $envNameList = array(
-            'USER',
-            'TYPO3_SYSTEM',
-            'TYPO3_CONTEXT',
-            'EDITOR',
-            'http_proxy',
-            'https_proxy',
-        );
+        $envNameList = ['USER', 'TYPO3_SYSTEM', 'TYPO3_CONTEXT', 'EDITOR', 'http_proxy', 'https_proxy'];
 
-        $envList = array();
+        $envList = [];
 
         foreach ($envNameList as $envName) {
             $envValue = getenv($envName);
@@ -66,10 +61,7 @@ class EnvCommand extends \CliTools\Console\Command\AbstractCommand
                 $envValue = '<comment>(empty)</comment>';
             }
 
-            $envList[] = array(
-                $envName,
-                $envValue,
-            );
+            $envList[] = [$envName, $envValue];
         }
 
         // ########################
@@ -77,7 +69,7 @@ class EnvCommand extends \CliTools\Console\Command\AbstractCommand
         // ########################
         /** @var \Symfony\Component\Console\Helper\Table $table */
         $table = new Table($output);
-        $table->setHeaders(array('Environment variable', 'Value'));
+        $table->setHeaders(['Environment variable', 'Value']);
 
         foreach ($envList as $envRow) {
             $table->addRow(array_values($envRow));

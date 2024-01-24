@@ -21,22 +21,24 @@ namespace CliTools\Console\Command\Php;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
+use CliTools\Console\Filter\AnyParameterFilterInterface;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\PhpUtility;
 use CliTools\Utility\UnixUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ComposerCommand extends \CliTools\Console\Command\AbstractCommand implements
-    \CliTools\Console\Filter\AnyParameterFilterInterface
+class ComposerCommand extends AbstractCommand implements AnyParameterFilterInterface
 {
 
+    protected static $defaultName = 'php:composer';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('php:composer')
+        $this
              ->setDescription('Search composer.json updir and start composer');
     }
 
@@ -94,20 +96,7 @@ class ComposerCommand extends \CliTools\Console\Command\AbstractCommand implemen
             return false;
         }
 
-        $commandList = array(
-            'archive',
-            'dump-autoload',
-            'dumpautoload',
-            'info',
-            'install',
-            'remove',
-            'require',
-            'run-script',
-            'status',
-            'suggests',
-            'update',
-            'validate',
-        );
+        $commandList = ['archive', 'dump-autoload', 'dumpautoload', 'info', 'install', 'remove', 'require', 'run-script', 'status', 'suggests', 'update', 'validate'];
 
         foreach ($commandList as $command) {
             if (in_array($command, $paramList, true)) {

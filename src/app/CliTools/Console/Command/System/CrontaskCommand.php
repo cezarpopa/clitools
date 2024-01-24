@@ -21,28 +21,30 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
+use CliTools\Console\Filter\OnlyRootFilterInterface;
 use CliTools\Shell\CommandBuilder\SelfCommandBuilder;
 use CliTools\Utility\UnixUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CrontaskCommand extends \CliTools\Console\Command\AbstractCommand implements
-    \CliTools\Console\Filter\OnlyRootFilterInterface
+class CrontaskCommand extends AbstractCommand implements OnlyRootFilterInterface
 {
 
+    protected static $defaultName = 'system:crontask';
     /**
      * List of warning messages
      *
      * @var array
      */
-    protected $sysCheckMessageList = array();
+    protected $sysCheckMessageList = [];
 
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:crontask')
+        $this
              ->setDescription('System cron task');
     }
 
@@ -157,10 +159,7 @@ class CrontaskCommand extends \CliTools\Console\Command\AbstractCommand implemen
             foreach ($mountInfoList as $mount => $stats) {
                 $usageInt = $stats['usageInt'];
 
-                $statsLine = array(
-                    $usageInt . '% used',
-                    \CliTools\Utility\FormatUtility::bytes($stats['free']) . ' free',
-                );
+                $statsLine = [$usageInt . '% used', \CliTools\Utility\FormatUtility::bytes($stats['free']) . ' free'];
 
                 if ($usageInt >= $diskUsageLimit) {
                     $this->sysCheckMessageList[] = 'Mount "' . $mount . '" exceeds limit of ' . $diskUsageLimit . '% (' . implode(

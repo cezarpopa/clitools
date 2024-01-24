@@ -21,20 +21,22 @@ namespace CliTools\Console\Command\Log;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PhpCommand extends \CliTools\Console\Command\AbstractCommand
+class PhpCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'log:php';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('log:php')
-             ->setAliases(array('php:log'))
+        $this
+             ->setAliases(['php:log'])
              ->setDescription('Show up php log')
              ->addArgument(
                  'grep',
@@ -62,9 +64,7 @@ class PhpCommand extends \CliTools\Console\Command\AbstractCommand
         $output->writeln('<h2>Starting php log tail</h2>');
 
         // Show log
-        $logList = array(
-            '/var/log/php-fpm/dev.error.log',
-        );
+        $logList = ['/var/log/php-fpm/dev.error.log'];
 
         return $this->showLog($logList, $input, $output, $grep);
     }

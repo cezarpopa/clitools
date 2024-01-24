@@ -21,21 +21,23 @@ namespace CliTools\Console\Command\Docker;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Filter\AnyParameterFilterInterface;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Shell\CommandBuilder\RemoteCommandBuilder;
 use CliTools\Utility\PhpUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CliCommand extends AbstractCommand implements \CliTools\Console\Filter\AnyParameterFilterInterface
+class CliCommand extends AbstractCommand implements AnyParameterFilterInterface
 {
 
+    protected static $defaultName = 'docker:cli';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:cli')
+        $this
              ->setDescription(
                  'Run cli command in docker container'
              );

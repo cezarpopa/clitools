@@ -92,7 +92,7 @@ abstract class ConsoleUtility
             if ($line instanceof \Exception) {
                 /** @var \Exception $e */
                 $e      = $line;
-                $line   = array();
+                $line   = [];
                 $line[] = '--- EXCEPTION ---';
                 $line[] = $e->getMessage();
                 $line[] = ' FILE: ' . $e->getFile();
@@ -134,10 +134,10 @@ abstract class ConsoleUtility
             $questionDialog = new QuestionHelper();
             $answer         = $questionDialog->ask(self::$input, self::$output, $question);
 
-            if (stripos($answer, 'n') === 0) {
+            if (stripos((string) $answer, 'n') === 0) {
                 $ret = false;
                 break;
-            } elseif (stripos($answer, 'y') === 0) {
+            } elseif (stripos((string) $answer, 'y') === 0) {
                 $ret = true;
                 break;
             }

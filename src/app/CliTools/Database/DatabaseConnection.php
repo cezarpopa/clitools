@@ -255,7 +255,7 @@ class DatabaseConnection
     {
         $fieldList = array_keys($values);
 
-        $valueList = array();
+        $valueList = [];
         foreach ($values as $value) {
             $valueList[] = self::quote($value);
         }
@@ -273,7 +273,7 @@ class DatabaseConnection
      * @return string
      * @throws \PDOException
      */
-    public static function quote($value)
+    public static function quote(mixed $value)
     {
         return self::getConnection()
                    ->quote($value);
@@ -289,7 +289,7 @@ class DatabaseConnection
      */
     public static function quoteArray($valueList)
     {
-        $ret = array();
+        $ret = [];
         foreach ($valueList as $k => $v) {
             $ret[$k] = self::quote($v);
         }
@@ -348,7 +348,7 @@ class DatabaseConnection
      */
     public static function getAll($query)
     {
-        $ret = array();
+        $ret = [];
 
         $res = self::query($query);
 
@@ -371,7 +371,7 @@ class DatabaseConnection
      */
     public static function getAllWithIndex($query, $indexCol = null)
     {
-        $ret = array();
+        $ret = [];
 
         $res = self::query($query);
         if ($res) {
@@ -400,7 +400,7 @@ class DatabaseConnection
      */
     public static function getCol($query)
     {
-        $ret = array();
+        $ret = [];
 
         $res = self::query($query);
 
@@ -421,7 +421,7 @@ class DatabaseConnection
      */
     public static function getColWithIndex($query)
     {
-        $ret = array();
+        $ret = [];
 
         $res = self::query($query);
 
@@ -443,7 +443,7 @@ class DatabaseConnection
      */
     public static function getList($query)
     {
-        $ret = array();
+        $ret = [];
 
         $res = self::query($query);
 
@@ -484,7 +484,7 @@ class DatabaseConnection
         $ret   = DatabaseConnection::getCol($query);
 
         // Filter mysql specific databases
-        $ret = array_diff($ret, array('mysql', 'information_schema', 'performance_schema'));
+        $ret = array_diff($ret, ['mysql', 'information_schema', 'performance_schema']);
 
         return $ret;
     }
@@ -678,7 +678,7 @@ class DatabaseConnection
      */
     public static function sanitizeSqlIdentifier($value)
     {
-        $ret = preg_replace('/[\0\\\\\/\.]/', '', $value);
+        $ret = preg_replace('/[\0\\\\\/\.]/', '', (string) $value);
 
         // Rule: Database, table, and column names cannot end with space characters.
         $ret = rtrim($ret);

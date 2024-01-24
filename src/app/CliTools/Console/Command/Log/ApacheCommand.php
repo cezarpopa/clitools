@@ -21,20 +21,22 @@ namespace CliTools\Console\Command\Log;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ApacheCommand extends \CliTools\Console\Command\AbstractCommand
+class ApacheCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'log:apache';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('log:apache')
-             ->setAliases(array('apache:log'))
+        $this
+             ->setAliases(['apache:log'])
              ->setDescription(
                  'Show up apache log'
              )
@@ -64,10 +66,7 @@ class ApacheCommand extends \CliTools\Console\Command\AbstractCommand
         $output->writeln('<h2>Starting apache log tail</h2>');
 
         // Show log
-        $logList = array(
-            '/var/log/apache2/access.log',
-            '/var/log/apache2/error.log',
-        );
+        $logList = ['/var/log/apache2/access.log', '/var/log/apache2/error.log'];
 
         return $this->showLog($logList, $input, $output, $grep);
     }

@@ -24,6 +24,7 @@ namespace CliTools\Console\Command\Sync;
 class RestoreCommand extends AbstractShareCommand
 {
 
+    protected static $defaultName = 'share:restore';
     /**
      * Configure command
      */
@@ -31,7 +32,7 @@ class RestoreCommand extends AbstractShareCommand
     {
         parent::configure();
 
-        $this->setName('share:restore')
+        $this
              ->setDescription('Restore files and database from share');
     }
 
@@ -107,7 +108,7 @@ class RestoreCommand extends AbstractShareCommand
                 continue;
             }
 
-            list($database) = explode('.', $item->getFilename(), 2);
+            [$database] = explode('.', $item->getFilename(), 2);
 
             if (!empty($database)) {
                 $this->output->writeln('<h1>Restoring database ' . $database . '</h1>');

@@ -30,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SlowLogCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:slowlog';
     /**
      * Configure command
      */
@@ -37,7 +38,7 @@ class SlowLogCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:slowlog')
+        $this
              ->setDescription('Enable and show slow query log')
              ->addArgument(
                  'grep',
@@ -85,7 +86,7 @@ class SlowLogCommand extends AbstractCommand
 
         $debugLogLocation = $this->getApplication()
                                  ->getConfigValue('db', 'debug_log_dir', '/tmp');
-        $debugLogDir      = dirname($debugLogLocation);
+        $debugLogDir      = dirname((string) $debugLogLocation);
 
         $output->writeln('<h2>Starting MySQL slow query log</h2>');
 

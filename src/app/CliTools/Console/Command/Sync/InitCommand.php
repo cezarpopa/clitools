@@ -29,12 +29,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitCommand extends \CliTools\Console\Command\AbstractCommand
 {
 
+    protected static $defaultName = 'sync-init';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('sync-init')
+        $this
              ->setDescription('Create example clisync.yml');
     }
 

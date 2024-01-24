@@ -30,12 +30,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ListCommand extends \CliTools\Console\Command\AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:list';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('typo3:list')
+        $this
              ->setDescription('List all TYPO3 instances')
              ->addArgument(
                  'path',
@@ -63,17 +64,17 @@ class ListCommand extends \CliTools\Console\Command\AbstractCommand
 
         $basePath = Typo3Utility::guessBestTypo3BasePath($basePath, $input, 'path');
 
-        $versionFileList = array(
+        $versionFileList = [
             // 6.x version
             '/typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php' => '/define\(\'TYPO3_version\',[\s]*\'([^\']+)\'\)/i',
             // 4.x version
             '/t3lib/config_default.php'                                    => '/\$TYPO_VERSION[\s]*=[\s]*\'([^\']+)\'/i',
-        );
+        ];
 
         // ####################
         // Find and loop through TYPO3 instances
         // ####################
-        $typo3List = array();
+        $typo3List = [];
 
         foreach (Typo3Utility::getTypo3InstancePathList($basePath, $maxDepth) as $dirPath) {
             $typo3Version = null;
@@ -92,7 +93,7 @@ class ListCommand extends \CliTools\Console\Command\AbstractCommand
                 }
             }
 
-            if (strpos($typo3Version, '6') === 0) {
+            if (str_starts_with($typo3Version, '6')) {
                 // TYPO3 6.x
                 $typo3Version = '<info>' . $typo3Version . '</info>';
             } elseif (!empty($typo3Version)) {
@@ -103,14 +104,11 @@ class ListCommand extends \CliTools\Console\Command\AbstractCommand
                 $typo3Version = '<error>unknown</error>';
             }
 
-            $typo3List[] = array(
-                $typo3Path,
-                $typo3Version,
-            );
+            $typo3List[] = [$typo3Path, $typo3Version];
         }
 
         $table = new Table($output);
-        $table->setHeaders(array('Path', 'Version'));
+        $table->setHeaders(['Path', 'Version']);
         foreach ($typo3List as $row) {
             $table->addRow(array_values($row));
         }

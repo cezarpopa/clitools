@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Iterator\Filter\ProcProcessDirectoryFilter;
 use CliTools\Utility\FormatUtility;
 use Symfony\Component\Console\Helper\Table;
@@ -28,15 +29,16 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SwapCommand extends \CliTools\Console\Command\AbstractCommand
+class SwapCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:swap';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:swap')
+        $this
              ->setDescription('List swap usage');
     }
 
@@ -55,7 +57,7 @@ class SwapCommand extends \CliTools\Console\Command\AbstractCommand
         $dirIterator = new \DirectoryIterator('/proc');
         $dirIterator = new ProcProcessDirectoryFilter($dirIterator);
 
-        $procList  = array();
+        $procList  = [];
         $swapTotal = 0;
         foreach ($dirIterator as $dirEntry) {
             /** @var \DirectoryIterator $dirEntry */
@@ -74,10 +76,7 @@ class SwapCommand extends \CliTools\Console\Command\AbstractCommand
                     $procList[$processName]['swap'] += $processSwap;
                 } else {
                     // new proc
-                    $procList[$processName] = array(
-                        'name' => $processName,
-                        'swap' => $processSwap,
-                    );
+                    $procList[$processName] = ['name' => $processName, 'swap' => $processSwap];
                 }
             }
         }
@@ -88,9 +87,7 @@ class SwapCommand extends \CliTools\Console\Command\AbstractCommand
 
         uasort(
             $procList,
-            function ($a, $b) {
-                return $a['swap'] > $b['swap'];
-            }
+            fn($a, $b) => $a['swap'] > $b['swap']
         );
 
         // ########################
@@ -99,7 +96,7 @@ class SwapCommand extends \CliTools\Console\Command\AbstractCommand
         if (!empty($procList)) {
             /** @var \Symfony\Component\Console\Helper\Table $table */
             $table = new Table($output);
-            $table->setHeaders(array('Process', 'Swap'));
+            $table->setHeaders(['Process', 'Swap']);
 
             foreach ($procList as $procRow) {
                 $procRow['swap'] = FormatUtility::bytes($procRow['swap']);
@@ -108,7 +105,7 @@ class SwapCommand extends \CliTools\Console\Command\AbstractCommand
 
             // Stats: average
             $table->addRow(new TableSeparator());
-            $statsRow                = array();
+            $statsRow                = [];
             $statsRow['name']        = 'Total';
             $statsRow['table_count'] = FormatUtility::bytes($swapTotal);
             $table->addRow(array_values($statsRow));

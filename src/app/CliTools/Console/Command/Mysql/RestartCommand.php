@@ -28,12 +28,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RestartCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:restart';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('mysql:restart')
+        $this
              ->setDescription('Restart MySQL');
     }
 

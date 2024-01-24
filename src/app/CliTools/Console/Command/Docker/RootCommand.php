@@ -29,12 +29,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RootCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:root';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:root')
+        $this
              ->setDescription('Enter shell as root in docker container')
              ->addArgument(
                  'container',

@@ -37,7 +37,7 @@ abstract class AbstractTraceCommand extends AbstractCommand
      *
      * @var array
      */
-    protected $traceProcessNameList = array();
+    protected $traceProcessNameList = [];
 
     /**
      * Configure command
@@ -97,7 +97,7 @@ abstract class AbstractTraceCommand extends AbstractCommand
         $output->writeln('<h2>Starting process stracing</h2>');
 
         if (empty($pid)) {
-            list($pidList, $processList) = $this->buildProcessList();
+            [$pidList, $processList] = $this->buildProcessList();
 
             if ($input->getOption('all')) {
                 $pid = 'all';
@@ -109,7 +109,7 @@ abstract class AbstractTraceCommand extends AbstractCommand
                     $questionDialog = new QuestionHelper();
 
                     $pid = $questionDialog->ask($input, $output, $question);
-                } catch (\InvalidArgumentException $e) {
+                } catch (\InvalidArgumentException) {
                     // Invalid value, just stop here
                     throw new \CliTools\Exception\StopException(1);
                 }
@@ -117,15 +117,10 @@ abstract class AbstractTraceCommand extends AbstractCommand
         }
 
         if (!empty($pid)) {
-            switch ($pid) {
-                case 'all':
-                    $command->addArgumentTemplate('-p %s', implode(',', $pidList));
-                    break;
-
-                default:
-                    $command->addArgumentTemplate('-p %s', $pid);
-                    break;
-            }
+            match ($pid) {
+                'all' => $command->addArgumentTemplate('-p %s', implode(',', $pidList)),
+                default => $command->addArgumentTemplate('-p %s', $pid),
+            };
 
             // Stats
             if ($input->getOption('c')) {
@@ -168,9 +163,7 @@ abstract class AbstractTraceCommand extends AbstractCommand
     {
         $currentPid = posix_getpid();
 
-        $processList = array(
-            'all' => 'all processes',
-        );
+        $processList = ['all' => 'all processes'];
 
         $command = new CommandBuilder('ps');
         $command->addArgumentRaw('h -o pid,comm,args')
@@ -181,11 +174,11 @@ abstract class AbstractTraceCommand extends AbstractCommand
         $cmdOutput = $command->execute()
                              ->getOutput();
 
-        $pidList = array();
+        $pidList = [];
         foreach ($cmdOutput as $outputLine) {
-            $outputLine      = trim($outputLine);
+            $outputLine      = trim((string) $outputLine);
             $outputLineParts = preg_split('/[\s]+/', $outputLine);
-            list($pid, $cmd) = $outputLineParts;
+            [$pid, $cmd] = $outputLineParts;
 
             $pid = (int)$pid;
 
@@ -203,6 +196,6 @@ abstract class AbstractTraceCommand extends AbstractCommand
             $processList[(int)$pid] = $cmd;
         }
 
-        return array($pidList, $processList);
+        return [$pidList, $processList];
     }
 }

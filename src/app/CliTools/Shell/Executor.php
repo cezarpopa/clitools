@@ -70,7 +70,7 @@ class Executor
      *
      * @var array<callable>
      */
-    protected $finishers = array();
+    protected $finishers = [];
 
     // ##########################################
     // Methods
@@ -101,7 +101,6 @@ class Executor
     /**
      * Set command
      *
-     * @param CommandBuilderInterface $command
      *
      * @return $this
      */
@@ -179,7 +178,7 @@ class Executor
     {
         $this->output     = null;
         $this->returnCode = null;
-        $this->finishers  = array();
+        $this->finishers  = [];
     }
 
 
@@ -222,11 +221,13 @@ class Executor
 
         ConsoleUtility::verboseWriteln('EXEC::INTERACTIVE', $this->command->build());
 
-        $descriptorSpec = array(
-            0 => array('file', 'php://stdin', 'r'),  // stdin is a file that the child will read from
-            1 => array('file', 'php://stdout', 'w'),  // stdout is a file that the child will write to
-            2 => array('file', 'php://stderr', 'w')   // stderr is a file that the child will write to
-        );
+        $descriptorSpec = [
+            0 => ['file', 'php://stdin', 'r'],
+            // stdin is a file that the child will read from
+            1 => ['file', 'php://stdout', 'w'],
+            // stdout is a file that the child will write to
+            2 => ['file', 'php://stderr', 'w'],
+        ];
 
         $process = proc_open($this->command->build(), $descriptorSpec, $pipes);
 
@@ -316,8 +317,6 @@ class Executor
 
     /**
      * Add finisher callback (will run after command execution)
-     *
-     * @param callable $callback
      */
     public function addFinisherCallback(callable $callback)
     {

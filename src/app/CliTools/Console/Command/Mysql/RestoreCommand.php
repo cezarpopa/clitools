@@ -30,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RestoreCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:restore';
     /**
      * Configure command
      */
@@ -37,7 +38,7 @@ class RestoreCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:restore')
+        $this
              ->setDescription('Restore database')
              ->addArgument(
                  'db',
@@ -75,8 +76,8 @@ class RestoreCommand extends AbstractCommand
         $output->writeln('<h2>Restoring dump "' . $dumpFile . '" into database "' . $database . '"</h2>');
 
         $output->writeln('<p>Creating database</p>');
-        $this->execSqlCommand('DROP DATABASE IF EXISTS ' . addslashes($database), 'mysql');
-        $this->execSqlCommand('CREATE DATABASE ' . addslashes($database),'mysql');
+        $this->execSqlCommand('DROP DATABASE IF EXISTS ' . addslashes((string) $database), 'mysql');
+        $this->execSqlCommand('CREATE DATABASE ' . addslashes((string) $database),'mysql');
 
         $commandMysql = $this->createMysqlCommand($database, '--one-database');
 

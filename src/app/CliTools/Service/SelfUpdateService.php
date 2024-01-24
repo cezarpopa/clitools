@@ -72,7 +72,7 @@ class SelfUpdateService
      *
      * @var array
      */
-    protected $cliToolsCommandPerms = array();
+    protected $cliToolsCommandPerms = [];
 
     /**
      * Update path
@@ -80,16 +80,6 @@ class SelfUpdateService
      * @var null|string
      */
     protected $cliToolsUpdatePath;
-
-    /**
-     * @var null|\Symfony\Component\Console\Output\OutputInterface
-     */
-    protected $output;
-
-    /**
-     * @var null|\CliTools\Console\Application
-     */
-    protected $application;
 
     /**
      * If pre releases should be used
@@ -103,12 +93,11 @@ class SelfUpdateService
      *
      * @param $app
      * @param $output
+     * @param null|\Symfony\Component\Console\Output\OutputInterface $output
+     * @param null|\CliTools\Console\Application $app
      */
-    public function __construct($app, $output)
+    public function __construct(protected $application, protected $output)
     {
-        $this->application = $app;
-        $this->output      = $output;
-
         $this->collectInformations();
     }
 
@@ -254,7 +243,7 @@ class SelfUpdateService
             if (!empty($this->updateChangelog)) {
                 $this->showChangelog();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->output->writeln('<error>Update failed</error>');
         }
 
@@ -269,7 +258,7 @@ class SelfUpdateService
         $this->output->write('<info>Getting informations from GitHub... </info>');
 
         $releaseList = \CliTools\Utility\PhpUtility::curlFetch($this->githubReleaseUrl);
-        $releaseList = json_decode($releaseList, true);
+        $releaseList = json_decode((string) $releaseList, true);
 
         if (!empty($releaseList)) {
             foreach ($releaseList as $release) {
@@ -292,7 +281,7 @@ class SelfUpdateService
                 }
 
                 // Get basic informations
-                $this->updateVersion   = trim($release['tag_name']);
+                $this->updateVersion   = trim((string) $release['tag_name']);
                 $this->updateChangelog = $release['body'];
 
                 foreach ($release['assets'] as $asset) {
@@ -329,9 +318,7 @@ class SelfUpdateService
         // Pad lines
         $message = explode("\n", $message);
         $message = array_map(
-            function ($line) {
-                return '  ' . $line;
-            },
+            fn($line) => '  ' . $line,
             $message
         );
         $message = implode("\n", $message);

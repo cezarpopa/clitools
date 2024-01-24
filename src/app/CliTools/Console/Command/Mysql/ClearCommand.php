@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ClearCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:clear';
     /**
      * Configure command
      */
@@ -35,8 +36,8 @@ class ClearCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:clear')
-             ->setAliases(array('mysql:create'))
+        $this
+             ->setAliases(['mysql:create'])
              ->setDescription(
                  'Clear (recreate) database'
              )
@@ -62,8 +63,8 @@ class ClearCommand extends AbstractCommand
         $output->writeln('<h2>Clearing database "' . $database . '"</h2>');
 
         $output->writeln('<p>Creating database</p>');
-        $this->execSqlCommand('DROP DATABASE IF EXISTS ' . addslashes($database));
-        $this->execSqlCommand('CREATE DATABASE ' . addslashes($database));
+        $this->execSqlCommand('DROP DATABASE IF EXISTS ' . addslashes((string) $database));
+        $this->execSqlCommand('CREATE DATABASE ' . addslashes((string) $database));
 
         $output->writeln('<h2>Database "' . $database . '" recreated</h2>');
 

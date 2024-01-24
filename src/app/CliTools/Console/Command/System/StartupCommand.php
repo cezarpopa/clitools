@@ -21,6 +21,8 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
+use CliTools\Console\Filter\OnlyRootFilterInterface;
 use CliTools\Database\DatabaseConnection;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Shell\CommandBuilder\SelfCommandBuilder;
@@ -28,16 +30,16 @@ use CliTools\Utility\UnixUtility;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StartupCommand extends \CliTools\Console\Command\AbstractCommand implements
-    \CliTools\Console\Filter\OnlyRootFilterInterface
+class StartupCommand extends AbstractCommand implements OnlyRootFilterInterface
 {
 
+    protected static $defaultName = 'system:startup';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:startup')
+        $this
              ->setDescription('System startup task');
     }
 
@@ -105,7 +107,7 @@ class StartupCommand extends \CliTools\Console\Command\AbstractCommand implement
                         )
                         ->executeInteractive();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // do nothing if no mysql is running
         }
     }

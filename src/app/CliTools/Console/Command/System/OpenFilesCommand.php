@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\FormatUtility;
 use Symfony\Component\Console\Helper\Table;
@@ -28,15 +29,16 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OpenFilesCommand extends \CliTools\Console\Command\AbstractCommand
+class OpenFilesCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:openfiles';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:openfiles')
+        $this
              ->setDescription('List swap usage');
     }
 
@@ -52,7 +54,7 @@ class OpenFilesCommand extends \CliTools\Console\Command\AbstractCommand
     {
         $this->elevateProcess($input, $output);
 
-        $procList       = array();
+        $procList       = [];
         $openFilesTotal = 0;
 
         $command = new CommandBuilder('lsof', '-n');
@@ -70,15 +72,12 @@ class OpenFilesCommand extends \CliTools\Console\Command\AbstractCommand
 
         foreach ($execOutput as $execOutputLine) {
             // get open files and proc name from output
-            list($procOpenFiles, $procName) = explode(' ', trim($execOutputLine), 2);
+            [$procOpenFiles, $procName] = explode(' ', trim((string) $execOutputLine), 2);
 
             // add to total stats
             $openFilesTotal += $procOpenFiles;
 
-            $procList[] = array(
-                'name'       => $procName,
-                'open_files' => $procOpenFiles,
-            );
+            $procList[] = ['name'       => $procName, 'open_files' => $procOpenFiles];
         }
 
         // ########################
@@ -86,7 +85,7 @@ class OpenFilesCommand extends \CliTools\Console\Command\AbstractCommand
         // ########################
         /** @var \Symfony\Component\Console\Helper\Table $table */
         $table = new Table($output);
-        $table->setHeaders(array('Process', 'Open Files'));
+        $table->setHeaders(['Process', 'Open Files']);
 
         foreach ($procList as $procRow) {
             $procRow['open_files'] = FormatUtility::number($procRow['open_files']);
@@ -95,7 +94,7 @@ class OpenFilesCommand extends \CliTools\Console\Command\AbstractCommand
 
         // Stats: average
         $table->addRow(new TableSeparator());
-        $statsRow               = array();
+        $statsRow               = [];
         $statsRow['name']       = 'Total';
         $statsRow['open_files'] = FormatUtility::number($openFilesTotal);
         $table->addRow(array_values($statsRow));

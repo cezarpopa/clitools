@@ -120,7 +120,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractCommand
 
         // rebuild dsn
         if ($dsn === false) {
-            $dsn = 'mysql:host=' . urlencode($host) . ';port=' . (int)$port;
+            $dsn = 'mysql:host=' . urlencode((string) $host) . ';port=' . (int)$port;
         }
 
         // user

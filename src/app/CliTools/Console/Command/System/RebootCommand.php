@@ -21,20 +21,22 @@ namespace CliTools\Console\Command\System;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RebootCommand extends \CliTools\Console\Command\AbstractCommand
+class RebootCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'system:reboot';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('system:reboot')
-             ->setAliases(array('reboot'))
+        $this
+             ->setAliases(['reboot'])
              ->setDescription('Reboot system');
     }
 

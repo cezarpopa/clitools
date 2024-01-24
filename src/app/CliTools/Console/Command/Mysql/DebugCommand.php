@@ -30,6 +30,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DebugCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'mysql:debug';
     /**
      * Configure command
      */
@@ -37,8 +38,8 @@ class DebugCommand extends AbstractCommand
     {
         parent::configure();
 
-        $this->setName('mysql:debug')
-             ->setAliases(array('mysql:querylog'))
+        $this
+             ->setAliases(['mysql:querylog'])
              ->setDescription(
                 'Debug mysql connections'
              )
@@ -67,7 +68,7 @@ class DebugCommand extends AbstractCommand
     {
         $debugLogLocation = $this->getApplication()
                                  ->getConfigValue('db', 'debug_log_dir', '/tmp');
-        $debugLogDir      = dirname($debugLogLocation);
+        $debugLogDir      = dirname((string) $debugLogLocation);
 
         $keepLog  = (bool)$input->getOption('keep-log');
 

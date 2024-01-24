@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\Sync;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractDockerCommand;
 use CliTools\Database\DatabaseConnection;
 use CliTools\Reader\ConfigReader;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
@@ -41,11 +42,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Yaml\Yaml;
 
-abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerCommand
+abstract class AbstractCommand extends AbstractDockerCommand
 {
 
-    const CONFIG_FILE = 'clisync.yml';
-    const GLOBAL_KEY  = 'GLOBAL';
+    final public const CONFIG_FILE = 'clisync.yml';
+    final public const GLOBAL_KEY  = 'GLOBAL';
 
     /**
      * Config area
@@ -80,14 +81,14 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      *
      * @var ConfigReader
      */
-    protected $config = array();
+    protected $config = [];
 
     /**
      * Context configuration
      *
      * @var ConfigReader
      */
-    protected $contextConfig = array();
+    protected $contextConfig = [];
 
     /**
      * Configure command
@@ -179,7 +180,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
             $password = $this->config->get('LOCAL.mysql.password');
         }
 
-        $dsn = 'mysql:host=' . urlencode($hostname) . ';port=' . (int)$port;
+        $dsn = 'mysql:host=' . urlencode((string) $hostname) . ';port=' . (int)$port;
 
         DatabaseConnection::setDsn($dsn, $username, $password);
     }
@@ -192,15 +193,15 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $useDockerMysql = false;
 
         if ($this->config->exists('LOCAL.mysql.docker')) {
-            $this->setLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL , $this->config->get('LOCAL.mysql.docker'));
+            $this->setLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL , $this->config->get('LOCAL.mysql.docker'));
             $useDockerMysql = true;
         } elseif ($this->config->exists('LOCAL.mysql.docker-compose')) {
-            $this->setLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL , $this->config->get('LOCAL.mysql.docker-compose'), true);
+            $this->setLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL , $this->config->get('LOCAL.mysql.docker-compose'), true);
             $useDockerMysql = true;
         }
 
         if ($useDockerMysql) {
-            $password = DockerUtility::getDockerContainerEnv($this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL ), 'MYSQL_ROOT_PASSWORD');
+            $password = DockerUtility::getDockerContainerEnv($this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL ), 'MYSQL_ROOT_PASSWORD');
             DatabaseConnection::setDsn('mysql:host=localhost', 'root', $password);
         }
     }
@@ -242,10 +243,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      */
     protected function findConfigurationInPath()
     {
-        $confFileList = array(
-            self::CONFIG_FILE,
-            '.' . self::CONFIG_FILE,
-        );
+        $confFileList = [self::CONFIG_FILE, '.' . self::CONFIG_FILE];
 
         // Find configuration file
         $this->confFilePath = UnixUtility::findFileInDirectortyTree($confFileList);
@@ -305,7 +303,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      */
     protected function getCommandList($section)
     {
-        $ret = array();
+        $ret = [];
 
         if ($this->contextConfig->exists('command.' . $section)) {
             $ret = $this->contextConfig->get('command.' . $section);
@@ -324,7 +322,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $this->contextConfig = new ConfigReader();
 
         // Fetch global conf
-        $globalConf = array();
+        $globalConf = [];
         if ($this->config->exists(self::GLOBAL_KEY)) {
             $globalConf = $this->config->get(self::GLOBAL_KEY);
         }
@@ -333,7 +331,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $areaConf = $this->config->get($this->confArea);
 
         // Fetch area global conf
-        $areaGlobalConf = array();
+        $areaGlobalConf = [];
         if ($this->config->exists($this->confArea . '.' . self::GLOBAL_KEY)) {
             $areaGlobalConf = $this->config->get($this->confArea . '.' . self::GLOBAL_KEY);
         }
@@ -347,7 +345,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
 
 
         $arrayFilterRecursive = function ($input, $callback) use (&$arrayFilterRecursive) {
-            $ret = array();
+            $ret = [];
             foreach ($input as $key => $value) {
                 if (is_array($value)) {
                     $value = $arrayFilterRecursive($value, $callback);
@@ -439,16 +437,16 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
             // ########################
 
             $serverList = $this->config->getList($this->confArea);
-            $serverList = array_diff($serverList, array(self::GLOBAL_KEY));
+            $serverList = array_diff($serverList, [self::GLOBAL_KEY]);
 
             if (empty($serverList)) {
                 throw new \RuntimeException('No valid servers found in configuration');
             }
 
-            $serverOptionList = array();
+            $serverOptionList = [];
 
             foreach ($serverList as $context) {
-                $line = array();
+                $line = [];
 
                 // hostname
                 $optPath = $this->confArea . '.' . $context . '.ssh.hostname';
@@ -466,12 +464,12 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
                 $optPath = $this->confArea . '.' . $context . '.mysql.database';
                 if ($this->config->exists($optPath)) {
                     $dbList        = $this->config->getArray($optPath);
-                    $foreignDbList = array();
+                    $foreignDbList = [];
 
                     foreach ($dbList as $databaseConf) {
-                        if (strpos($databaseConf, ':') !== false) {
+                        if (str_contains((string) $databaseConf, ':')) {
                             // local and foreign database in one string
-                            $databaseConf    = explode(':', $databaseConf, 2);
+                            $databaseConf    = explode(':', (string) $databaseConf, 2);
                             $foreignDbList[] = $databaseConf[1];
                         } else {
                             // database equal
@@ -501,7 +499,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
                 $questionDialog = new QuestionHelper();
 
                 $ret = $questionDialog->ask($this->input, $this->output, $question);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // Invalid server context, just stop here
                 throw new \CliTools\Exception\StopException(1);
             }
@@ -630,7 +628,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $commandList = $this->getCommandList($area);
 
         if (!empty($commandList)) {
-            $this->output->writeln('<info> ---- Starting ' . strtoupper($area) . ' commands ---- </info>');
+            $this->output->writeln('<info> ---- Starting ' . strtoupper((string) $area) . ' commands ---- </info>');
 
             foreach ($commandList as $commandRow) {
 
@@ -701,12 +699,12 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      */
     protected function createRsyncCommandWithConfiguration($source, $target, $confKey)
     {
-        $options = array();
+        $options = [];
 
         // #############
         // Filelist
         // #############
-        $fileList = array();
+        $fileList = [];
         if ($this->contextConfig->exists($confKey . '.directory')) {
             $fileList = $this->contextConfig->get($confKey . '.directory');
         }
@@ -715,7 +713,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         // #############
         // Excludes
         // #############
-        $excludeList = array();
+        $excludeList = [];
         if ($this->contextConfig->exists($confKey . '.exclude')) {
             $excludeList = $this->contextConfig->get($confKey . '.exclude');
         }
@@ -723,24 +721,14 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         // Max size
         // #############
         if ($this->contextConfig->exists($confKey . '.conf.maxSize')) {
-            $options['max-size'] = array(
-                'template' => '--max-size=%s',
-                'params'   => array(
-                    $this->contextConfig->get($confKey . '.conf.maxSize')
-                ),
-            );
+            $options['max-size'] = ['template' => '--max-size=%s', 'params'   => [$this->contextConfig->get($confKey . '.conf.maxSize')]];
         }
 
         // #############
         // Min size
         // #############
         if ($this->contextConfig->exists($confKey . '.conf.minSize')) {
-            $options['min-size'] = array(
-                'template' => '--min-size=%s',
-                'params'   => array(
-                    $this->contextConfig->get($confKey . '.conf.minSize')
-                ),
-            );
+            $options['min-size'] = ['template' => '--min-size=%s', 'params'   => [$this->contextConfig->get($confKey . '.conf.minSize')]];
         }
 
         return $this->createRsyncCommand($source, $target, $fileList, $excludeList, $options);
@@ -901,8 +889,8 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $command = new SelfCommandBuilder();
         $command->addArgumentTemplate('mysql:restore %s %s', $database, $dumpFile);
 
-        if ($this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
-            $command->addArgumentTemplate('--docker %s', $this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL ));
+        if ($this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
+            $command->addArgumentTemplate('--docker %s', $this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL ));
         } elseif ($this->config->exists('LOCAL.mysql.hostname')) {
             $command->addArgumentTemplate('--host %s', $this->config->get('LOCAL.mysql.hostname'));
         }
@@ -937,8 +925,8 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         $command = new SelfCommandBuilder();
         $command->addArgumentTemplate('mysql:backup %s %s', $database, $dumpFile);
 
-        if ($this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
-            $command->addArgumentTemplate('--docker %s', $this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL ));
+        if ($this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
+            $command->addArgumentTemplate('--docker %s', $this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL ));
         } elseif ($this->config->exists('LOCAL.mysql.hostname')) {
             $command->addArgumentTemplate('--host %s', $this->config->get('LOCAL.mysql.hostname'));
         }
@@ -969,7 +957,6 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
     /**
      * Wrap command with ssh if needed
      *
-     * @param  CommandBuilderInterface $command
      *
      * @return CommandBuilderInterface
      */
@@ -1043,14 +1030,14 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      */
     protected function createLocalMySqlCommand($database = null)
     {
-        $command = $this->localDockerCommandBuilderFactory(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL , 'mysql');
+        $command = $this->localDockerCommandBuilderFactory(AbstractDockerCommand::DOCKER_ALIAS_MYSQL , 'mysql');
         $command
             // batch mode
             ->addArgument('-B')
             // skip column names
             ->addArgument('-N');
 
-        if (!$this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
+        if (!$this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
             // Add username
             if (DatabaseConnection::getDbUsername()) {
                 $command->addArgumentTemplate('-u%s', DatabaseConnection::getDbUsername());
@@ -1140,9 +1127,9 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
      */
     protected function createLocalMySqlDumpCommand($database = null)
     {
-        $command = $this->localDockerCommandBuilderFactory(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL , 'mysqldump');
+        $command = $this->localDockerCommandBuilderFactory(AbstractDockerCommand::DOCKER_ALIAS_MYSQL , 'mysqldump');
 
-        if (!$this->getLocalDockerContainer(\CliTools\Console\Command\AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
+        if (!$this->getLocalDockerContainer(AbstractDockerCommand::DOCKER_ALIAS_MYSQL )) {
             // Add username
             if (DatabaseConnection::getDbUsername()) {
                 $command->addArgumentTemplate('-u%s', DatabaseConnection::getDbUsername());
@@ -1175,17 +1162,11 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
         }
 
         // Transfer compression
-        switch ($this->contextConfig->get('mysql.compression')) {
-            case 'bzip2':
-                // Add pipe compressor (bzip2 compressed transfer via ssh)
-                $command->addPipeCommand(new CommandBuilder('bzip2', '--compress --stdout'));
-                break;
-
-            case 'gzip':
-                // Add pipe compressor (gzip compressed transfer via ssh)
-                $command->addPipeCommand(new CommandBuilder('gzip', '--stdout'));
-                break;
-        }
+        match ($this->contextConfig->get('mysql.compression')) {
+            'bzip2' => $command->addPipeCommand(new CommandBuilder('bzip2', '--compress --stdout')),
+            'gzip' => $command->addPipeCommand(new CommandBuilder('gzip', '--stdout')),
+            default => $command,
+        };
 
         return $command;
     }

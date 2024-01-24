@@ -31,12 +31,13 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 class SniffCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:sniff';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:sniff')
+        $this
              ->setDescription('Start network sniffing with docker')
              ->addArgument(
                  'protocol',
@@ -262,21 +263,7 @@ class SniffCommand extends AbstractCommand
         $ret = null;
 
         if (!$this->input->getArgument('protocol')) {
-            $protocolList = array(
-                'http'          => 'HTTP (requests only)',
-                'http-full'     => 'HTTP (full)',
-                'php-fpm'       => 'PHP-FPM',
-                'solr'          => 'Solr',
-                'elasticsearch' => 'Elasticsearch',
-                'memcache'      => 'Memcache',
-                'redis'         => 'Redis',
-                'smtp'          => 'SMTP',
-                'mysql'         => 'MySQL queries',
-                'dns'           => 'DNS',
-                'tcp'           => 'TCP',
-                'icmp'          => 'ICMP',
-                'arp'           => 'ARP',
-            );
+            $protocolList = ['http'          => 'HTTP (requests only)', 'http-full'     => 'HTTP (full)', 'php-fpm'       => 'PHP-FPM', 'solr'          => 'Solr', 'elasticsearch' => 'Elasticsearch', 'memcache'      => 'Memcache', 'redis'         => 'Redis', 'smtp'          => 'SMTP', 'mysql'         => 'MySQL queries', 'dns'           => 'DNS', 'tcp'           => 'TCP', 'icmp'          => 'ICMP', 'arp'           => 'ARP'];
 
             try {
                 $question = new ChoiceQuestion('Please choose network protocol for sniffing', $protocolList);
@@ -285,7 +272,7 @@ class SniffCommand extends AbstractCommand
                 $questionDialog = new QuestionHelper();
 
                 $ret = $questionDialog->ask($this->input, $this->output, $question);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // Invalid server context, just stop here
                 throw new \CliTools\Exception\StopException(1);
             }

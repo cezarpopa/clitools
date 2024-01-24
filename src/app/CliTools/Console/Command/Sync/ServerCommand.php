@@ -26,6 +26,7 @@ use CliTools\Database\DatabaseConnection;
 class ServerCommand extends AbstractRemoteSyncCommand
 {
 
+    protected static $defaultName = 'sync';
     /**
      * Configure command
      */
@@ -35,7 +36,7 @@ class ServerCommand extends AbstractRemoteSyncCommand
 
         $this->confArea = 'sync';
 
-        $this->setName('sync')
+        $this
              ->setDescription('Sync files and database from server');
     }
 
@@ -142,9 +143,9 @@ class ServerCommand extends AbstractRemoteSyncCommand
         // Sync databases
         // ##################
         foreach ($this->contextConfig->getArray('mysql.database') as $databaseConf) {
-            if (strpos($databaseConf, ':') !== false) {
+            if (str_contains((string) $databaseConf, ':')) {
                 // local and foreign database in one string
-                list($localDatabase, $foreignDatabase) = explode(':', $databaseConf, 2);
+                [$localDatabase, $foreignDatabase] = explode(':', (string) $databaseConf, 2);
             } else {
                 // database equal
                 $localDatabase   = $databaseConf;
@@ -152,8 +153,8 @@ class ServerCommand extends AbstractRemoteSyncCommand
             }
 
             // make sure we don't have any leading whitespaces
-            $localDatabase   = trim($localDatabase);
-            $foreignDatabase = trim($foreignDatabase);
+            $localDatabase   = trim((string) $localDatabase);
+            $foreignDatabase = trim((string) $foreignDatabase);
 
             $dumpFile = $this->tempDir . '/' . $localDatabase . '.sql.dump';
 

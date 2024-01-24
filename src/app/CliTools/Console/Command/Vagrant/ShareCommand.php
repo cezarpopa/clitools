@@ -21,6 +21,7 @@ namespace CliTools\Console\Command\Vagrant;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Shell\CommandBuilder\SelfCommandBuilder;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,15 +29,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ShareCommand extends \CliTools\Console\Command\AbstractCommand
+class ShareCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'vagrant:share';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('vagrant:share')
+        $this
              ->setDescription('Start share for vagrant')
              ->addArgument(
                  'name',
@@ -143,9 +145,7 @@ class ShareCommand extends \CliTools\Console\Command\AbstractCommand
         $this->getApplication()
              ->registerTearDown($cleanupCallback);
 
-        $opts = array(
-            'runningCallback' => $runningCallback,
-        );
+        $opts = ['runningCallback' => $runningCallback];
 
         $vagrant = new CommandBuilder('vagrant', 'share');
 

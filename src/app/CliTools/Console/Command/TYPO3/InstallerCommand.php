@@ -30,12 +30,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InstallerCommand extends \CliTools\Console\Command\AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:installer';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('typo3:installer')
+        $this
              ->setDescription(
                  'Enable installer on all (or one specific) TYPO3 instances'
              )

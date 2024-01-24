@@ -21,21 +21,23 @@ namespace CliTools\Console\Command\TYPO3;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\Typo3Utility;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ClearCacheCommand extends \CliTools\Console\Command\AbstractCommand
+class ClearCacheCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:clearcache';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('typo3:clearcache')
+        $this
              ->setDescription(
                  'Clear cache on all (or one specific) TYPO3 instances'
              )
@@ -80,11 +82,7 @@ class ClearCacheCommand extends \CliTools\Console\Command\AbstractCommand
                 continue;
             }
 
-            $params = array(
-                $dirPath . '/typo3/cli_dispatch.phpsh',
-                'coreapi',
-                'cache:clearallcaches'
-            );
+            $params = [$dirPath . '/typo3/cli_dispatch.phpsh', 'coreapi', 'cache:clearallcaches'];
 
             $output->writeln('<p>Running clearcache command on ' . $dirPath . '</p>');
             try {

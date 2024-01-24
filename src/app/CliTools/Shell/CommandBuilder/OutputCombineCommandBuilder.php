@@ -29,12 +29,11 @@ class OutputCombineCommandBuilder extends AbstractCommandBuilder
      *
      * @var array
      */
-    protected $commandList = array();
+    protected $commandList = [];
 
     /**
      * Add command for combined output
      *
-     * @param CommandBuilderInterface $command
      *
      * @return $this
      */
@@ -74,7 +73,7 @@ class OutputCombineCommandBuilder extends AbstractCommandBuilder
     {
         $ret = parent::__clone();
 
-        $this->commandList = array();
+        $this->commandList = [];
 
         return $ret;
     }
@@ -88,14 +87,14 @@ class OutputCombineCommandBuilder extends AbstractCommandBuilder
      */
     public function build()
     {
-        $ret = array();
+        $ret = [];
 
         if (!$this->isExecuteable()) {
             throw new \RuntimeException('Command is not executable or available');
         }
 
         // Generate list of combined commands
-        $combinedList = array();
+        $combinedList = [];
         foreach ($this->commandList as $command) {
             $combinedList[] = $command->build();
         }
@@ -123,7 +122,7 @@ class OutputCombineCommandBuilder extends AbstractCommandBuilder
     {
         parent::__clone();
 
-        $commandList = array();
+        $commandList = [];
         foreach ($this->commandList as $command) {
             $commandList[] = clone $command;
         }

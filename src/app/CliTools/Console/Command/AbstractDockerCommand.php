@@ -29,7 +29,7 @@ use CliTools\Utility\DockerUtility;
 abstract class AbstractDockerCommand extends AbstractCommand
 {
 
-    const DOCKER_ALIAS_MYSQL = 'mysql';
+    public const DOCKER_ALIAS_MYSQL = 'mysql';
 
     /**
      * Docker container
@@ -97,18 +97,18 @@ abstract class AbstractDockerCommand extends AbstractCommand
     protected function execSqlQuery($sql, $assoc = true)
     {
         $delimiter = "\t";
-        $ret = array();
+        $ret = [];
         $result = $this->createMysqlCommand('--column-names', '-e', $sql)->execute()->getOutput();
 
         if (empty($result)) {
             return [];
         }
 
-        $columnList = explode($delimiter, $result[0]);
+        $columnList = explode($delimiter, (string) $result[0]);
         unset($result[0]);
 
         foreach ($result as $line) {
-            $values = explode($delimiter, $line);
+            $values = explode($delimiter, (string) $line);
 
             if ($assoc) {
                 $ret[] = array_combine($columnList, $values);
@@ -146,7 +146,7 @@ abstract class AbstractDockerCommand extends AbstractCommand
         $ret = $this->execSqlCommand($sql);
 
         // Filter mysql specific databases
-        $ret = array_diff($ret, array('mysql', 'information_schema', 'performance_schema'));
+        $ret = array_diff($ret, ['mysql', 'information_schema', 'performance_schema']);
 
         return $ret;
     }

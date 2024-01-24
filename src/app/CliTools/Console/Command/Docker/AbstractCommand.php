@@ -21,12 +21,13 @@ namespace CliTools\Console\Command\Docker;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractDockerCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Shell\CommandBuilder\CommandBuilderInterface;
 use CliTools\Utility\DockerUtility;
 use CliTools\Utility\PhpUtility;
 
-abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerCommand
+abstract class AbstractCommand extends AbstractDockerCommand
 {
 
     /**
@@ -39,7 +40,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
     /**
      * @var array
      */
-    protected $runningContainerCache = array();
+    protected $runningContainerCache = [];
 
     /**
      * Search and return for updir docker path
@@ -167,12 +168,12 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
                 if (!empty($conf)
                     && !empty($conf->State)
                     && !empty($conf->State->Status)
-                    && in_array(strtolower($conf->State->Status), ['running'], true)
+                    && in_array(strtolower((string) $conf->State->Status), ['running'], true)
                 ) {
                     $ret = true;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $ret = false;
         }
 
@@ -286,7 +287,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
                 ) . '" in docker container "' . $containerName . '" ...</info>'
             );
 
-            $dockerCommand = new CommandBuilder('docker-compose', 'run --rm %s', array($containerName));
+            $dockerCommand = new CommandBuilder('docker-compose', 'run --rm %s', [$containerName]);
             $dockerCommand->append($command, false);
             $dockerCommand->executeInteractive();
         } else {
@@ -325,7 +326,7 @@ abstract class AbstractCommand extends \CliTools\Console\Command\AbstractDockerC
                     ->setOutputRedirect(CommandBuilder::OUTPUT_REDIRECT_NO_STDERR);
                 $fullContainerName = $command->execute()->getOutputString();
                 break;
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // container not running
                 continue;
             }

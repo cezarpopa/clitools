@@ -21,21 +21,23 @@ namespace CliTools\Console\Command\TYPO3;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use CliTools\Shell\CommandBuilder\CommandBuilder;
 use CliTools\Utility\Typo3Utility;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SchedulerCommand extends \CliTools\Console\Command\AbstractCommand
+class SchedulerCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'typo3:scheduler';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('typo3:scheduler')
+        $this
              ->setDescription(
                  'Run scheduler on all (or one specific) TYPO3 instances'
              )
@@ -77,7 +79,7 @@ class SchedulerCommand extends \CliTools\Console\Command\AbstractCommand
                 $command->addArgument('/typo3/cli_dispatch.phpsh')
                         ->addArgument('scheduler')
                         ->executeInteractive();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $output->writeln('<error>Failed TYPO3 scheduler on ' . $dirPath . '</error>');
             }
         }

@@ -33,17 +33,17 @@ class AbstractCommandBuilder implements CommandBuilderInterface
     /**
      * Redirect STDOUT and STDERR to /dev/null (no output)
      */
-    const OUTPUT_REDIRECT_NULL = ' &> /dev/null';
+    public const OUTPUT_REDIRECT_NULL = ' &> /dev/null';
 
     /**
      * Redirect STDERR to STDOUT
      */
-    const OUTPUT_REDIRECT_ALL_STDOUT = ' 2>&1';
+    public const OUTPUT_REDIRECT_ALL_STDOUT = ' 2>&1';
 
     /**
      * Redirect STDERR to /dev/null (no error output)
      */
-    const OUTPUT_REDIRECT_NO_STDERR = ' 2> /dev/null';
+    public const OUTPUT_REDIRECT_NO_STDERR = ' 2> /dev/null';
 
     // ##########################################
     // Attributs
@@ -61,7 +61,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      *
      * @var array
      */
-    protected $argumentList = array();
+    protected $argumentList = [];
 
     /**
      * Output redirection
@@ -75,7 +75,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      *
      * @var array
      */
-    protected $pipeList = array();
+    protected $pipeList = [];
 
     /**
      * Executor
@@ -89,7 +89,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      *
      * @var array
      */
-    protected $envList = array();
+    protected $envList = [];
 
     // ##########################################
     // Methods
@@ -115,7 +115,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
             if (is_array($args)) {
                 $this->setArgumentList($args);
             } else {
-                if (strpos($args, '%s') !== false) {
+                if (str_contains($args, '%s')) {
                     // sprintf string found
                     $this->addArgumentTemplateList($args, $argParams);
                 } else {
@@ -167,10 +167,10 @@ class AbstractCommandBuilder implements CommandBuilderInterface
     public function clear()
     {
         $this->command        = null;
-        $this->argumentList   = array();
+        $this->argumentList   = [];
         $this->outputRedirect = null;
-        $this->pipeList       = array();
-        $this->envList        = array();
+        $this->pipeList       = [];
+        $this->envList        = [];
 
         return $this;
     }
@@ -182,7 +182,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      */
     public function clearArguments()
     {
-        $this->argumentList = array();
+        $this->argumentList = [];
 
         return $this;
     }
@@ -194,7 +194,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      */
     public function clearEnvironment()
     {
-        $this->envList = array();
+        $this->envList = [];
 
         return $this;
     }
@@ -358,7 +358,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
     protected function appendArgumentsToList($args, $escape = true)
     {
         // Validate each argument value
-        array_walk($args, array($this, 'validateArgumentValue'));
+        array_walk($args, $this->validateArgumentValue(...));
 
         if ($escape) {
             $args = array_map('escapeshellarg', $args);
@@ -540,7 +540,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      */
     public function clearPipes()
     {
-        $this->pipeList = array();
+        $this->pipeList = [];
 
         return $this;
     }
@@ -582,7 +582,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      */
     public function build()
     {
-        $ret = array();
+        $ret = [];
 
         if (!$this->isExecuteable()) {
             throw new \RuntimeException(
@@ -591,7 +591,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
         }
 
         foreach ($this->envList as $envName => $envValue) {
-            $ret[] = $envName . '=' . escapeshellarg($envValue);
+            $ret[] = $envName . '=' . escapeshellarg((string) $envValue);
         }
 
         // Add command
@@ -672,9 +672,9 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      *
      * @throws \RuntimeException
      */
-    protected function validateArgumentValue($value)
+    protected function validateArgumentValue(mixed $value)
     {
-        if (strlen($value) === 0) {
+        if (strlen((string) $value) === 0) {
             throw new \RuntimeException('Argument value cannot be empty');
         }
     }
@@ -698,7 +698,7 @@ class AbstractCommandBuilder implements CommandBuilderInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->build();
     }

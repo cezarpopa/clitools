@@ -27,6 +27,7 @@ use CliTools\Shell\CommandBuilder\DockerExecCommandBuilder;
 use CliTools\Shell\CommandBuilder\FullSelfCommandBuilder;
 use CliTools\Utility\ConsoleUtility;
 use CliTools\Utility\DockerUtility;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,14 +35,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractCommand extends Command
 {
 
-    const DOCKER_ALIAS_MYSQL = 'mysql';
+    public const DOCKER_ALIAS_MYSQL = 'mysql';
 
     /**
      * Message list (will be shown at the end)
      *
      * @var array
      */
-    protected $finishMessageList = array();
+    protected $finishMessageList = [];
 
     /**
      * Input
@@ -110,7 +111,7 @@ abstract class AbstractCommand extends Command
      *
      * @api
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
 
         try {
@@ -166,7 +167,7 @@ abstract class AbstractCommand extends Command
                 $commandSudo = new CommandBuilder('sudo');
                 $commandSudo->append($commandMyself, false);
                 $commandSudo->executeInteractive();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // do not display exception here because it's a child process
             }
             throw new \CliTools\Exception\StopException(0);
@@ -242,7 +243,7 @@ abstract class AbstractCommand extends Command
             }
         }
 
-        $this->finishMessageList = array();
+        $this->finishMessageList = [];
     }
 
     /**
@@ -252,7 +253,7 @@ abstract class AbstractCommand extends Command
      *
      * @api
      */
-    public function getApplication()
+    public function getApplication(): ?Application
     {
         return parent::getApplication();
     }
@@ -278,13 +279,13 @@ abstract class AbstractCommand extends Command
 
         $args = func_get_args();
 
-        $titleList = array();
+        $titleList = [];
         foreach ($args as $value) {
             if (is_array($value)) {
                 $value = implode(' ', $value);
             }
 
-            $titleList[] = trim($value);
+            $titleList[] = trim((string) $value);
         }
 
         $title = implode(' ', $titleList);
@@ -375,18 +376,18 @@ abstract class AbstractCommand extends Command
     protected function execSqlQuery($sql, $assoc = true)
     {
         $delimiter = "\t";
-        $ret = array();
+        $ret = [];
         $result = $this->createMysqlCommand('--column-names', '-e', $sql)->execute()->getOutput();
 
         if (empty($result)) {
             return [];
         }
 
-        $columnList = explode($delimiter, $result[0]);
+        $columnList = explode($delimiter, (string) $result[0]);
         unset($result[0]);
 
         foreach ($result as $line) {
-            $values = explode($delimiter, $line);
+            $values = explode($delimiter, (string) $line);
 
             if ($assoc) {
                 $ret[] = array_combine($columnList, $values);
@@ -424,7 +425,7 @@ abstract class AbstractCommand extends Command
         $ret = $this->execSqlCommand($sql);
 
         // Filter mysql specific databases
-        $ret = array_diff($ret, array('mysql', 'information_schema', 'performance_schema'));
+        $ret = array_diff($ret, ['mysql', 'information_schema', 'performance_schema']);
 
         return $ret;
     }

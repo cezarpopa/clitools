@@ -24,8 +24,8 @@ namespace CliTools\Console\Command\Sync;
 abstract class AbstractShareCommand extends AbstractCommand
 {
 
-    const PATH_DUMP = '/dump/';
-    const PATH_DATA = '/data/';
+    final public const PATH_DUMP = '/dump/';
+    final public const PATH_DATA = '/data/';
 
     /**
      * Configure command

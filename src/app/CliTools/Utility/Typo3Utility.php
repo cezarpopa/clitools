@@ -27,8 +27,8 @@ use Symfony\Component\Console\Input\InputInterface;
 class Typo3Utility
 {
 
-    const PASSWORD_TYPE_MD5_SALTED = 'md5_salted';
-    const PASSWORD_TYPE_MD5        = 'md5';
+    final public const PASSWORD_TYPE_MD5_SALTED = 'md5_salted';
+    final public const PASSWORD_TYPE_MD5        = 'md5';
 
     /**
      * Generate TYPO3 password
@@ -97,7 +97,7 @@ class Typo3Utility
             $ret = $basePath;
         } else {
             // check if path is an absolute path
-            if (strpos($userPath, '/') === 0) {
+            if (str_starts_with((string) $userPath, '/')) {
                 $ret = $userPath;
             } else {
                 // relative path? try to guess the best match
@@ -127,7 +127,7 @@ class Typo3Utility
      */
     public static function getTypo3InstancePathList($basePath, $maxDepth = 3)
     {
-        $ret = array();
+        $ret = [];
 
         // ####################
         // Iterators

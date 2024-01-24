@@ -28,6 +28,7 @@ use CliTools\Shell\CommandBuilder\CommandBuilder;
 class DeployCommand extends AbstractRemoteSyncCommand
 {
 
+    protected static $defaultName = 'deploy';
     /**
      * Configure command
      */
@@ -37,7 +38,7 @@ class DeployCommand extends AbstractRemoteSyncCommand
 
         $this->confArea = 'deploy';
 
-        $this->setName('deploy')
+        $this
              ->setDescription('Deploy files and database to server');
     }
 
@@ -116,9 +117,9 @@ class DeployCommand extends AbstractRemoteSyncCommand
         // Sync databases
         // ##################
         foreach ($this->contextConfig->getArray('mysql.database') as $databaseConf) {
-            if (strpos($databaseConf, ':') !== false) {
+            if (str_contains((string) $databaseConf, ':')) {
                 // local and foreign database in one string
-                list($localDatabase, $foreignDatabase) = explode(':', $databaseConf, 2);
+                [$localDatabase, $foreignDatabase] = explode(':', (string) $databaseConf, 2);
             } else {
                 // database equal
                 $localDatabase   = $databaseConf;
@@ -126,8 +127,8 @@ class DeployCommand extends AbstractRemoteSyncCommand
             }
 
             // make sure we don't have any leading whitespaces
-            $localDatabase   = trim($localDatabase);
-            $foreignDatabase = trim($foreignDatabase);
+            $localDatabase   = trim((string) $localDatabase);
+            $foreignDatabase = trim((string) $foreignDatabase);
 
             $dumpFile = $this->tempDir . '/' . $localDatabase . '.sql.dump';
 
@@ -159,16 +160,11 @@ class DeployCommand extends AbstractRemoteSyncCommand
             ######################
             $this->output->writeln('<p>Pushing "' . $dumpFile . '" into remote database "' . $foreignDatabase . '"</p>');
 
-            switch ($this->contextConfig->get('mysql.compression')) {
-                case 'bzip2':
-                    $command = new CommandBuilder('bzcat', $dumpFile);
-                    break;
-                case 'gzip':
-                    $command = new CommandBuilder('gzip', '-dc ' . $dumpFile);
-                    break;
-                default:
-                    $command = new CommandBuilder('cat', $dumpFile);
-            }
+            $command = match ($this->contextConfig->get('mysql.compression')) {
+                'bzip2' => new CommandBuilder('bzcat', $dumpFile),
+                'gzip' => new CommandBuilder('gzip', '-dc ' . $dumpFile),
+                default => new CommandBuilder('cat', $dumpFile),
+            };
 
             $mysqlImportRemote = $this->createRemoteMySqlCommand($foreignDatabase);
             $mysqlImportRemote = $this->wrapRemoteCommand($mysqlImportRemote);

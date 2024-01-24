@@ -21,22 +21,25 @@ namespace CliTools\Console\Command\Php;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class TraceCommand extends \CliTools\Console\Command\AbstractTraceCommand
+use CliTools\Console\Command\AbstractTraceCommand;
+
+class TraceCommand extends AbstractTraceCommand
 {
 
+    protected static $defaultName = 'php:trace';
     /**
      * Process names for strace'ing
      *
      * @var array
      */
-    protected $traceProcessNameList = array('php5-fpm', 'php-fpm', 'php5', 'php');
+    protected $traceProcessNameList = ['php5-fpm', 'php-fpm', 'php5', 'php'];
 
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('php:trace')
+        $this
              ->setDescription('Debug PHP processes with strace');
         parent::configure();
     }

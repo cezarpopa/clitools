@@ -21,20 +21,22 @@ namespace CliTools\Console\Command\Log;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DebugCommand extends \CliTools\Console\Command\AbstractCommand
+class DebugCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'log:debug';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('log:debug')
-             ->setAliases(array('debug'))
+        $this
+             ->setAliases(['debug'])
              ->setDescription('Show up debugging log')
              ->addArgument(
                  'grep',
@@ -62,16 +64,13 @@ class DebugCommand extends \CliTools\Console\Command\AbstractCommand
         $output->writeln('<h2>Starting debug log tail</h2>');
 
         // Show log
-        $logList = array(
+        $logList = [
             //	'/var/log/apache2/access.log',
             '/var/log/apache2/error.log',
             '/var/log/php-fpm/dev.error.log',
-        );
+        ];
 
-        $optionList = array(
-            '--mark-interval 5',
-            '-n 0',
-        );
+        $optionList = ['--mark-interval 5', '-n 0'];
 
         return $this->showLog($logList, $input, $output, $grep, $optionList);
     }

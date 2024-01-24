@@ -29,12 +29,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class UpCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:up';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:up')
+        $this
              ->setDescription('Start docker container (with fast switching)')
              ->addOption(
                  'switch',
@@ -114,7 +115,7 @@ class UpCommand extends AbstractCommand
 
             // Jump back
             \CliTools\Utility\PhpUtility::chdir($currentPath);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
     }
 }

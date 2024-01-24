@@ -28,12 +28,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MysqlCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'docker:mysql';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('docker:mysql')
+        $this
              ->setDescription('Enter mysql in docker container');
     }
 

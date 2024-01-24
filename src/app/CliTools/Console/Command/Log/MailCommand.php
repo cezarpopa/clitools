@@ -21,19 +21,21 @@ namespace CliTools\Console\Command\Log;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use CliTools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MailCommand extends \CliTools\Console\Command\AbstractCommand
+class MailCommand extends AbstractCommand
 {
 
+    protected static $defaultName = 'log:mail';
     /**
      * Configure command
      */
     protected function configure()
     {
-        $this->setName('log:mail')
+        $this
              ->setDescription('Show up mail log')
              ->addArgument(
                  'grep',
@@ -61,9 +63,7 @@ class MailCommand extends \CliTools\Console\Command\AbstractCommand
         $output->writeln('<h2>Starting mail log tail</h2>');
 
         // Show log
-        $logList = array(
-            '/var/log/mail.log',
-        );
+        $logList = ['/var/log/mail.log'];
 
         return $this->showLog($logList, $input, $output, $grep);
     }

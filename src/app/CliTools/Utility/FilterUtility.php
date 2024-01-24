@@ -34,11 +34,11 @@ class FilterUtility
      */
     public static function mysqlTableFilter(array $tables, array $filters)
     {
-        $ignoredTables = array();
+        $ignoredTables = [];
 
         foreach ($tables as $table) {
             foreach ($filters as $filter) {
-                if (preg_match($filter, $table)) {
+                if (preg_match($filter, (string) $table)) {
                     continue 2;
                 }
             }
@@ -60,14 +60,14 @@ class FilterUtility
      */
     public static function mysqlIgnoredTableFilter(array $tables, array $blacklist = null, array $whitelist = null, $database = null)
     {
-        $ignoredTables = array();
+        $ignoredTables = [];
 
         // first of all: put all non-whitelisted tables on "ignore list"
         if ($whitelist && is_array($whitelist)) {
             foreach ($tables as &$table) {
                 $allowed = false;
                 foreach ($whitelist as $filter) {
-                    if (preg_match($filter, $table)) {
+                    if (preg_match($filter, (string) $table)) {
                         $allowed = true;
                     }
                 }
@@ -86,7 +86,7 @@ class FilterUtility
         if ($blacklist && is_array($blacklist)) {
             foreach ($tables as $table) {
                 foreach ($blacklist as $filter) {
-                    if (preg_match($filter, $table)) {
+                    if (preg_match($filter, (string) $table)) {
                         if ($database !== null) {
                             $ignoredTables[] = $database . '.' . $table;
                         } else {
